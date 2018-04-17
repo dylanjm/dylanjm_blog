@@ -106,7 +106,71 @@ pander::pander(head(tuition.raw[,1:6]))</code></pre>
          pct.change = (tuition-lag)/lag) %&gt;% # compute rolling 5 yr. percent change
   na.omit()
 
-# create our map data
+pander::pander(head(tuition.clean))</code></pre>
+<table style="width:72%;">
+<colgroup>
+<col width="18%" />
+<col width="13%" />
+<col width="13%" />
+<col width="9%" />
+<col width="16%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center">state</th>
+<th align="center">year</th>
+<th align="center">tuition</th>
+<th align="center">lag</th>
+<th align="center">pct.change</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">Alabama</td>
+<td align="center">2009-10</td>
+<td align="center">7189</td>
+<td align="center">5683</td>
+<td align="center">0.265</td>
+</tr>
+<tr class="even">
+<td align="center">Alaska</td>
+<td align="center">2009-10</td>
+<td align="center">5455</td>
+<td align="center">4328</td>
+<td align="center">0.2602</td>
+</tr>
+<tr class="odd">
+<td align="center">Arizona</td>
+<td align="center">2009-10</td>
+<td align="center">7263</td>
+<td align="center">5138</td>
+<td align="center">0.4135</td>
+</tr>
+<tr class="even">
+<td align="center">Arkansas</td>
+<td align="center">2009-10</td>
+<td align="center">6627</td>
+<td align="center">5772</td>
+<td align="center">0.1481</td>
+</tr>
+<tr class="odd">
+<td align="center">California</td>
+<td align="center">2009-10</td>
+<td align="center">7259</td>
+<td align="center">5286</td>
+<td align="center">0.3732</td>
+</tr>
+<tr class="even">
+<td align="center">Colorado</td>
+<td align="center">2009-10</td>
+<td align="center">6948</td>
+<td align="center">4704</td>
+<td align="center">0.4772</td>
+</tr>
+</tbody>
+</table>
+<p>As we can see, this format will make plotting our data much easier.</p>
+<pre class="r"><code># create our map data
 us &lt;- usa_composite()
 us_map &lt;- broom::tidy(us, region = &quot;name&quot;)</code></pre>
 <pre class="r"><code># Plot choropleth map

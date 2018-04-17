@@ -40,6 +40,11 @@ tuition.clean <- tuition.raw %>%
          pct.change = (tuition-lag)/lag) %>% # compute rolling 5 yr. percent change
   na.omit()
 
+pander::pander(head(tuition.clean))
+```
+
+As we can see, this format will make plotting our data much easier.
+```{r}
 # create our map data
 us <- usa_composite()
 us_map <- broom::tidy(us, region = "name")
