@@ -50,6 +50,7 @@ us <- usa_composite()
 us_map <- broom::tidy(us, region = "name")
 ```
 
+At this point we've cleaned our data and have it in log format. We should be able to go ahead and plot our data and take a look at the results. 
 
 ```{r, eval=FALSE}
 # Plot choropleth map
