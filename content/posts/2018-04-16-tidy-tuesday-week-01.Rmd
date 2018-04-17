@@ -43,12 +43,13 @@ tuition.clean <- tuition.raw %>%
 pander::pander(head(tuition.clean))
 ```
 
-As we can see, this format will make plotting our data much easier.
+As we can see, this format will make plotting our data much easier. Also we need to initialize our map data so that we can plot the spatial data from our dataset
 ```{r}
 # create our map data
 us <- usa_composite()
 us_map <- broom::tidy(us, region = "name")
 ```
+
 
 ```{r, eval=FALSE}
 # Plot choropleth map
