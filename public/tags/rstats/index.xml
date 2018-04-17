@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Rstats on All Models are Wrong...</title>
+    <link>/tags/rstats/</link>
+    <description>Recent content in Rstats on All Models are Wrong...</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <managingEditor>dylan.mcdowell226@gmail.com (Dylan McDowell)</managingEditor>
+    <webMaster>dylan.mcdowell226@gmail.com (Dylan McDowell)</webMaster>
+    <lastBuildDate>Mon, 16 Apr 2018 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="/tags/rstats/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Tidy Tuesday Week 01</title>
+      <link>/posts/tidy-tuesday-week-01/</link>
+      <pubDate>Mon, 16 Apr 2018 00:00:00 +0000</pubDate>
+      <author>dylan.mcdowell226@gmail.com (Dylan McDowell)</author>
+      <guid>/posts/tidy-tuesday-week-01/</guid>
+      <description>Here are some R libraries we will need to reproduce the plots for this week’s #TidyTuesday
+library(tidyverse) library(readxl) library(albersusa) library(ggthemes)  Background The online community, R for Data Science, has started what’s called #TidyTuesday. Every week they post a new dataset along with an original graphic and challenge people to either 1) recreate the plot or 2) create their own take on the data. For the very first challenge, they posted a data set on student tuition across the United States.</description>
+    </item>
+    
+  </channel>
+</rss>

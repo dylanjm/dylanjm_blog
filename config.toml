@@ -1,0 +1,34 @@
+baseURL = "https://example.com/"
+title = "All Models are Wrong..."
+theme = "temple"
+# If not set, it will not appear. Otherwise it will show below your footer links
+googleAnalytics = ""
+disqusShortname = ""
+ignoreFiles = ["\\.Rmd$", "\\.Rmarkdown$", "_files$", "_cache$"]
+# enable emoji use, i.e. :smile:
+enableEmoji = true
+
+
+
+[params]
+  # Enables syntax highlighting
+  highlight = true 
+  # Supports highlighting for languages not included in the original pack
+  # See https://highlightjs.org/download/ for original pack
+  # For reference to all languages, see:
+  # https://github.com/isagalaev/highlight.js/tree/master/src/languages
+  hjslangs = ["go", "vim", "r", "python"]
+  # Enables the topmenu, which pulls from categories
+  topmenu = "categories"
+  faviconfile = "img/dylan_favicon.png"
+
+# Builds a list page for each category given
+[taxonomies]
+  tag = "tags"
+  category = "categories"
+
+[author]
+  name = "Dylan McDowell"
+  github = "dylanjm"
+  email = "dylan.mcdowell226@gmail.com"
+  twitter = "dylanjm_ds"
