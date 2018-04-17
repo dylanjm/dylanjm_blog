@@ -169,7 +169,7 @@ pander::pander(head(tuition.clean))</code></pre>
 </tr>
 </tbody>
 </table>
-<p>As we can see, this format will make plotting our data much easier.</p>
+<p>As we can see, this format will make plotting our data much easier. Also we need to initialize our map data so that we can plot the spatial data from our dataset</p>
 <pre class="r"><code># create our map data
 us &lt;- usa_composite()
 us_map &lt;- broom::tidy(us, region = &quot;name&quot;)</code></pre>

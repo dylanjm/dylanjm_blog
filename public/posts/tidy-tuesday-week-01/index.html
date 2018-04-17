@@ -338,7 +338,7 @@ body {
   
   
 
-  <meta name="generator" content="Hugo 0.38" />
+  <meta name="generator" content="Hugo 0.39" />
 
   
   
@@ -350,7 +350,7 @@ body {
     <div class="pure-u-11-12 pure-u-md-2-3">
         <div class="desktop pure-menu pure-menu-horizontal nav-menu">
             
-            <a href="/" class="site-title pure-menu-heading">All Models are Wrong...</a>
+            <a href="/" class="site-title pure-menu-heading">Uninformed Priors</a>
             <ul class="pure-menu-list pull-right">
 				
                 
@@ -365,7 +365,7 @@ body {
             </ul>
         </div>
         <div class="mobile pure-menu nav-menu">
-            <a href="/" class="site-title pure-menu-heading" id="toggle-home">All Models are Wrong...</a>
+            <a href="/" class="site-title pure-menu-heading" id="toggle-home">Uninformed Priors</a>
             <a href="#" id="toggle-btn">&#9776;</a>
             <ul class="pure-menu-list" id="toggle-content" style="display:none;">
                 
@@ -569,7 +569,7 @@ pander::pander(head(tuition.clean))</code></pre>
 </tr>
 </tbody>
 </table>
-<p>As we can see, this format will make plotting our data much easier.</p>
+<p>As we can see, this format will make plotting our data much easier. Also we need to initialize our map data so that we can plot the spatial data from our dataset</p>
 <pre class="r"><code># create our map data
 us &lt;- usa_composite()
 us_map &lt;- broom::tidy(us, region = &quot;name&quot;)</code></pre>
