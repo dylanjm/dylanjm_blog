@@ -173,6 +173,7 @@ pander::pander(head(tuition.clean))</code></pre>
 <pre class="r"><code># create our map data
 us &lt;- usa_composite()
 us_map &lt;- broom::tidy(us, region = &quot;name&quot;)</code></pre>
+<p>At this point we’ve cleaned our data and have it in log format. We should be able to go ahead and plot our data and take a look at the results.</p>
 <pre class="r"><code># Plot choropleth map
 ggplot() +
   geom_map(data = us_map, map = us_map,
