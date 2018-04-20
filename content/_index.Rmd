@@ -26,6 +26,6 @@ __"I'm always trying to do the stupidest possible thing to allow me to get out o
 
 
 
-Hello, my name is Dylan James McDowell. I am Financial Economics undergraduate with hopes to pursue a graduate degree in Mathematical Statistics with a research focus in Bayesian Methods & Decision Theory. I love coding in [#rstats](https://twitter.com/hashtag/rstats?src=hash) and [#python](https://twitter.com/hashtag/Python?src=hash) and currently am learning Stan. I love to read, write, and have #woahdude deep discussions with friends. I named this blog "Uninformed Priors" because __1)__ I'm really interested in Bayesian Statistics and __2)__ It desribes the way I often approach life with an open mind. Currently, I work as a Junior Data Scientist for a non-profit consulting firm primarily on agronomy projects. 
+Hello, my name is Dylan James McDowell. I am Financial Economics undergraduate with hopes to pursue a graduate degree in Mathematical Statistics with a research focus in Bayesian Methods & Decision Theory. I love coding in [#rstats](https://twitter.com/hashtag/rstats?src=hash) and [#python](https://twitter.com/hashtag/Python?src=hash) and currently am learning Stan. I love to read, write, and have #woahdude deep discussions with friends. I named this blog "Uninformed Priors" because __1)__ I'm really interested in Bayesian Statistics and __2)__ It desribes the way I often approach life with an open mind. Currently, I work as a Data Scientist & Project Manager for a non-profit consulting firm primarily on agronomy projects. 
 
 ***
