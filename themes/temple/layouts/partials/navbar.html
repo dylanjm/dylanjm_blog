@@ -3,7 +3,7 @@
     <div class="pure-u-11-12 pure-u-md-2-3">
         <div class="desktop pure-menu pure-menu-horizontal nav-menu">
             {{ $baseurl := .Site.BaseURL }}
-            <a href="{{$baseurl}}" class="site-title pure-menu-heading">{{ .Site.Title }}</a>
+            <a href="{{$baseurl}}" class="site-title pure-menu-heading"><img src="{{ $baseurl }}img/blog_logo.png" height="20px" width="40px" style="vertical-align: text-top"> {{ .Site.Title }}</a>
             <ul class="pure-menu-list pull-right">
 				{{ if eq .Site.Params.topmenu "categories" }}
                 {{ range $name,$page := .Site.Taxonomies.categories }}
