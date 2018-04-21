@@ -107,9 +107,11 @@ final_clean_dat %>%
        subtitle = "Graphic displays GDP/Pop for the countries of: United States, Russia, China, and Japan",
        x = "Year", y = "per capita GDP") +
   theme_bw() +
-  theme(panel.background = element_rect(color = "#fcfcfc"),
+  theme(plot.background=element_rect(fill="#fcfcfc"),
+        panel.background=element_rect(fill = "#fcfcfc"),
         legend.position = "bottom",
-        legend.title = element_blank())
+        legend.title = element_blank(),
+        legend.background = element_rect(fill="#fcfcfc"))
 ```
 
 That's it, thanks for reading. Hopefully you can gained a little better understanding of the usefullness of purrr and the functions it contains. You can find a gist of the script at my [github account](https://gist.github.com/dylanjm/474ab30a18a96e19c139d19801f0acc2). ∎

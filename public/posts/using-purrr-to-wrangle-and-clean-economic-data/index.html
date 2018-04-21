@@ -502,9 +502,11 @@ possibly_read_and_clean &lt;- possibly(read_and_clean, otherwise = NULL)</code><
        subtitle = &quot;Graphic displays GDP/Pop for the countries of: United States, Russia, China, and Japan&quot;,
        x = &quot;Year&quot;, y = &quot;per capita GDP&quot;) +
   theme_bw() +
-  theme(panel.background = element_rect(color = &quot;#fcfcfc&quot;),
+  theme(plot.background=element_rect(fill=&quot;#fcfcfc&quot;),
+        panel.background=element_rect(fill = &quot;#fcfcfc&quot;),
         legend.position = &quot;bottom&quot;,
-        legend.title = element_blank())</code></pre>
+        legend.title = element_blank(),
+        legend.background = element_rect(fill=&quot;#fcfcfc&quot;))</code></pre>
 <p><img src="/posts/2018-04-20-using-purrr-to-wrangle-and-clean-economic-data_files/figure-html/unnamed-chunk-8-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p>That’s it, thanks for reading. Hopefully you can gained a little better understanding of the usefullness of purrr and the functions it contains. You can find a gist of the script at my <a href="https://gist.github.com/dylanjm/474ab30a18a96e19c139d19801f0acc2">github account</a>. ∎</p>
 
