@@ -11,9 +11,9 @@ tags:
   - tidyverse
 ---
 
-I'm currently working on building a quantitative macroeconomics course with a professor of mine. The goal of the course is to introduce students within the Economics department to programming in Python and R. This is a big step for our department. Even though we have always been a fairly math heavy econ degree, the department has been stuck behind the curve in teaching students new and to date technicial skills. This professor, along with my help, wants to move the courses away from teachin STATA and Excel to equiping students with proper data analysis tools for the workforce and academia. 
+I'm currently working on building a quantitative macroeconomics course with a professor of mine. The goal of the course is to introduce students within the Economics department to programming in Python and R. This is a big step for our department. Even though we have always been a fairly math heavy econ degree, the department has been stuck behind the curve in teaching students new and up-to-date technicial skills. This professor, along with my help, wants to move the courses away from teaching STATA and Excel, to equiping students with proper data analysis tools for the workforce and academia. 
 
-The course is focusing on the material found in [Macroeconomics 4th Edition by Charles I. Jones](http://books.wwnorton.com/books/webad.aspx?id=4294993402) which, itself, is not focused on programming at all. We want to build a programming curriculum around the concepts in the book so students can stay interested in application of these skills. 
+The course is focusing on the material found in [Macroeconomics 4th Edition by Charles I. Jones](http://books.wwnorton.com/books/webad.aspx?id=4294993402) which, itself, is not focused on programming at all. We want to build a programming curriculum around the concepts in the book so students can stay interested in the application of these concepts. 
 
 One of the first assignments asks the students to read in data regarding per capita GDP of several countries around the world and greate a graphic showing the change in per capita GDP over time. The author in the book directs students to the data found at: [Country Snapshots 9.0](http://web.stanford.edu/~chadj/snapshots.pdf), which is a wonderful PDF document containing example plots and links to the excel files storing these economic data. 
 
@@ -29,7 +29,7 @@ library(rvest) # We'll utilize web scraping for a brief moment to get a list of 
 library(janitor) # Awesome package that makes cleaning messy data really easy
 ```
 
-The students will be asked to create a plot from the data of any country of there choosing from [this list of country codes](http://web.stanford.edu/~chadj/countrycodes6.3). This means that we'll need every possible country dataset pulled down and cleaned for students to utilize. Since we want to make sure we have the most recent list of countries everytime we run this code we're going to use `library(rvest)` to scrape this list and clean up it so we can use the sweet TLA (Three-Letter-Abreviation) country codes hidden inside 😋😋😋. 
+The students will be asked to create a plot from the data of any country of their choosing from [this list of country codes](http://web.stanford.edu/~chadj/countrycodes6.3). This means that we'll need every possible country dataset pulled down and cleaned for students to utilize. Since we want to make sure we have the most recent list of countries everytime we run this code, we're going to use `library(rvest)` to scrape this list and clean up it so we can use the sweet TLA (Three-Letter-Abreviation) country codes hidden inside 😋😋😋. 
 
 ```{r}
 # Rcode to go and fetch country codes
@@ -48,7 +48,7 @@ __Taking a look at the USA excel file shows some cleaning needs to be done__
 
 ![](../../img/usa_dat.png)
 
-Right off the bat we can see we'll need to skip the first few lines of code. There also appears to be a row of blank values after each of the headers. We'll want to make sure we get rid of unneccesary missing data and ensure that each column is correctly typed as numeric. Since our goal is to use purrr to eventually loop through all possible countries, we'll also want to create a column of the what country these data belong to. This will help when it comes to plot and store these data.
+Right off the bat we can see we'll need to skip the first 9 lines at the top of the excel file. There also appears to be a row of blank values after each of the headers. We'll want to make sure we get rid of unneccesary missing data and ensure that each column is correctly typed as numeric. Since our goal is to use purrr to eventually loop through all possible countries, we'll also want to create a column of the what country these data belong to. This will help when it comes to plottin and storing these data.
 
 ```{r}
 read_and_clean <- function(country_code = "USA"){
@@ -68,7 +68,7 @@ __A quick run of this function with "USA" as the default country code shows nice
 head(read_and_clean())
 ```
 
-Now given that I have ran and figured out all this code, for this next part I'm going to do a little hand waving. Apparently, there are some countries in our `country_codes` list that don't keep track of this data. Therefore, in my initial attempts to use `map()` to iterate across all TLA's, it would error out when running across a country that didn't have a corresponding excel file. This is why we need to use the `possibly()` function. For more info run `?purrr::possibly()` in your R console. 
+Now given that I have ran and figured out all this code, for this next part, I'm going to do a little hand waving. Apparently, there are some countries in our `country_codes` list that don't keep track of this data. Therefore, in my initial attempts to use `map()` to iterate across all TLA's, it would error out when running across a country that didn't have a corresponding excel file. This is why we need to use the `possibly()` function. For more info run `?purrr::possibly()` in your R console. 
 
 ```{r}
 # Now we may "possibly" be able to run this code without it stopping lol
@@ -84,12 +84,13 @@ __At this point we have three things left to do:__
 3. Use `purrr::map_df()` and `bind_rows()` to create one large data.frame for storing. 
 
 ```{r, eval=FALSE}
-final_clean_dat <- purrr::map(country_codes, ~ possibly_read_and_clean(.x)) %>% 
+final_clean_dat <- purrr::map(country_codes, 
+                              ~ possibly_read_and_clean(country_code = .x)) %>% 
   compact() %>% 
   map_df(bind_rows)
 ```
 
-Yay! 😄 Now we have one large dataset that can be updated at anypoint in time but also will remain unchanged in case the datasets ever go offline. This code will allow the students to focus more on the applications at hand and save the data cleaning for a later class. Since we've made it this far, let's finish off with a plot!
+Yay! 😄 Now we have one large dataset that can be updated at any point in time, but also will remain unchanged in case the datasets ever go offline. This code will allow the students to focus more on the applications at hand and save the data cleaning for a later class. Since we've made it this far, let's finish off with a plot!
 
 ```{r, include=FALSE}
 final_clean_dat <- read_csv("../../data/final_gdp_data.csv")
