@@ -1,0 +1,115 @@
+---
+title: Using purrr to wrangle and clean economic data
+author: Dylan McDowell
+date: '2018-04-20'
+slug: using-purrr-to-wrangle-and-clean-economic-data
+categories:
+  - Posts
+tags:
+  - purrr
+  - economics
+  - tidyverse
+---
+
+I'm currently working on building a quantitative macroeconomics course with a professor of mine. The goal of the course is to introduce students within the Economics department to programming in Python and R. This is a big step for our department. Even though we have always been a fairly math heavy econ degree, the department has been stuck behind the curve in teaching students new and to date technicial skills. This professor, along with my help, wants to move the courses away from teachin STATA and Excel to equiping students with proper data analysis tools for the workforce and academia. 
+
+The course is focusing on the material found in [Macroeconomics 4th Edition by Charles I. Jones](http://books.wwnorton.com/books/webad.aspx?id=4294993402) which, itself, is not focused on programming at all. We want to build a programming curriculum around the concepts in the book so students can stay interested in application of these skills. 
+
+One of the first assignments asks the students to read in data regarding per capita GDP of several countries around the world and greate a graphic showing the change in per capita GDP over time. The author in the book directs students to the data found at: [Country Snapshots 9.0](http://web.stanford.edu/~chadj/snapshots.pdf), which is a wonderful PDF document containing example plots and links to the excel files storing these economic data. 
+
+My professor is worried about changes to the datasets in the future and has asked me to create a repository of pre-cleaned datasets that the students can access without worrying about the data disapearing into the future. Since the class is only focused on the basics of programming, I figured I would clean up the data and store it in a nice table for students to access later. 
+
+In this write up we'll use `library(purrr)` to automate this retrevial of data. Some of the funcitons that we'll use from purrr are `compact()`, `map_df()`, and `possibly()` to ensure that our code is as dynamic as possible. So let's begin!
+
+__Here are some libraries we'll need to finish this task:__
+```{r, message=FALSE}
+library(tidyverse) # Includes purrr & %>% operator
+library(rio) # Will make reading in our .xls files quick and simple
+library(rvest) # We'll utilize web scraping for a brief moment to get a list of country codes
+library(janitor) # Awesome package that makes cleaning messy data really easy
+```
+
+The students will be asked to create a plot from the data of any country of there choosing from [this list of country codes](http://web.stanford.edu/~chadj/countrycodes6.3). This means that we'll need every possible country dataset pulled down and cleaned for students to utilize. Since we want to make sure we have the most recent list of countries everytime we run this code we're going to use `library(rvest)` to scrape this list and clean up it so we can use the sweet TLA (Three-Letter-Abreviation) country codes hidden inside 😋😋😋. 
+
+```{r}
+# Rcode to go and fetch country codes
+# Note: Wrapping the expression in parentheses "()" just evaluates and prints
+# the results on the spot.
+(country_codes <- read_html("http://web.stanford.edu/~chadj/countrycodes6.3") %>% 
+  html_text() %>% 
+  str_extract_all("[A-Z]{3}") %>% 
+  unlist() %>% 
+  .[order(.)])
+```
+
+Perfect! If you step back through the code and run it line by line you'll see why we needed to use a regular expression to pull all the TLA's from the web scraping results. The final pipe statements just orders the TLA's in alphbetical order. Now we can use these codes to loop through the urls that hold all the excel files (i.e. `http://www.stanford.edu/~chadj/snapshots/TLA.xls`). But before we do that, let's write a function to handle all the data munging and cleaning we'll need. 
+
+__Taking a look at the USA excel file shows some cleaning needs to be done__
+
+![](../../img/usa_dat.png)
+
+Right off the bat we can see we'll need to skip the first few lines of code. There also appears to be a row of blank values after each of the headers. We'll want to make sure we get rid of unneccesary missing data and ensure that each column is correctly typed as numeric. Since our goal is to use purrr to eventually loop through all possible countries, we'll also want to create a column of the what country these data belong to. This will help when it comes to plot and store these data.
+
+```{r}
+read_and_clean <- function(country_code = "USA"){
+  dat_url <- paste0("http://www.stanford.edu/~chadj/snapshots/", country_code, ".xls")
+  import(dat_url, skip = 9) %>% 
+    clean_names() %>% # Great function from library(janitor)
+    na.omit() %>% 
+    filter(population != "NaN") %>% 
+    mutate_all(as.numeric) %>% 
+    mutate(country = country_code)
+}
+```
+
+__A quick run of this function with "USA" as the default country code shows nice and tidy output:__
+
+```{r}
+head(read_and_clean())
+```
+
+Now given that I have ran and figured out all this code, for this next part I'm going to do a little hand waving. Apparently, there are some countries in our `country_codes` list that don't keep track of this data. Therefore, in my initial attempts to use `map()` to iterate across all TLA's, it would error out when running across a country that didn't have a corresponding excel file. This is why we need to use the `possibly()` function. For more info run `?purrr::possibly()` in your R console. 
+
+```{r}
+# Now we may "possibly" be able to run this code without it stopping lol
+possibly_read_and_clean <- possibly(read_and_clean, otherwise = NULL)
+```
+
+__At this point we have three things left to do:__
+
+1. Iterate through all country TLA's to create a list of data.frames.
+
+2. Given the missing files for some countries, drop the inevitible NA's from our list using `purrr:compact()`
+
+3. Use `purrr::map_df()` and `bind_rows()` to create one large data.frame for storing. 
+
+```{r, eval=FALSE}
+final_clean_dat <- purrr::map(country_codes, ~ possibly_read_and_clean(.x)) %>% 
+  compact() %>% 
+  map_df(bind_rows)
+```
+
+Yay! 😄 Now we have one large dataset that can be updated at anypoint in time but also will remain unchanged in case the datasets ever go offline. This code will allow the students to focus more on the applications at hand and save the data cleaning for a later class. Since we've made it this far, let's finish off with a plot!
+
+```{r, include=FALSE}
+final_clean_dat <- read_csv("../../data/final_gdp_data.csv")
+```
+
+```{r, fig.align='center'}
+final_clean_dat %>% 
+  filter(country %in% c("USA","RUS","CHN","JPN")) %>% 
+  ggplot(aes(x = year, y = y_pop, 
+             group = country, color = country)) +
+  geom_line(size = 1.5) +
+  scale_color_manual(values = c("#c67c73","#356984","#ebe948","#cccccc")) +
+  scale_y_continuous(labels = scales::comma) +
+  labs(title = "Country Snapshot, per capitia GDP 1960-2014",
+       subtitle = "Graphic displays GDP/Pop for the countries of: United States, Russia, China, and Japan",
+       x = "Year", y = "per capita GDP") +
+  theme_bw() +
+  theme(panel.background = element_rect(color = "#fcfcfc"),
+        legend.position = "bottom",
+        legend.title = element_blank())
+```
+
+That's it, thanks for reading. Hopefully you can gained a little better understanding of the usefullness of purrr and the functions it contains. You can find a gist of the script at my [github account](https://gist.github.com/dylanjm/474ab30a18a96e19c139d19801f0acc2). ∎

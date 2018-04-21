@@ -3,8 +3,8 @@
 <head>
   
   <meta charset="utf-8">
-  <title>About Me</title>
-  <meta name="description" content="About Me">
+  <title>Using purrr to wrangle and clean economic data</title>
+  <meta name="description" content="Using purrr to wrangle and clean economic data">
   <meta name="author" content="Dylan McDowell">
   
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -337,8 +337,6 @@ body {
 
   
   
-  <link href="/index.xml" rel="alternate" type="application/rss+xml" title="Uninformed Priors Feed" />
-  
 
   <meta name="generator" content="Hugo 0.38" />
 
@@ -388,97 +386,131 @@ body {
 </div>
 
 
-<style type="text/css" media="all">
-  div.post-content2 a:link{
-    color:#ba5b4e;
-  }
-  div.post-content2 a:visited{
-  color:#ba5b4e;
-}
-</style>
-
 <div class="pure-g">
   <div class="pure-u-1-24 pure-u-md-1-6"></div>
-	<div class="pure-u-11-12 pure-u-md-2-3">
-	<div class="post-content2">
-	  <script defer src="https://use.fontawesome.com/releases/v5.0.10/js/all.js" integrity="sha384-slN8GvtUJGnv6ca26v8EzVaR9DC58QEwsIk9q1QXdCU8Yu8ck/tL/5szYlBbqmS+" crossorigin="anonymous"></script>
-<center>
-<p><img src="../img/dylan.png"></p>
-<p><a href="mailto:dylan.mcdowell226@gmail.com" title="email"><i class="fas fa-envelope fa-3x"></i></a>
-<a href="https://github.com/dylanjm" title="github"><i class="fab fa-github fa-3x"></i></a>
-<a href="https://www.linkedin.com/in/dylan-mcdowell-1b9a2a116/" title="linkedin">
-<i class="fab fa-linkedin fa-3x"></i></a>
-<a href="" title="twitter"><i class="fab fa-twitter fa-3x"></i></a>
-<a href="https://stats.stackexchange.com/users/123097/dylanjm" title="crossvalidated">
-<i class="fab fa-stack-overflow fa-3x"></i></a><br></p>
-<p><strong>“I’m always trying to do the stupidest possible thing to allow me to get out of the project alive. Unfortunatley, the stupidest possible thing that could possibly work always seems to be a little bit more complicated than most complicated thing I already know how to do.”</strong></p>
--<a href="https://www.youtube.com/watch?v=T1gYvX5c2sM">Andrew Gelman</a>
-</center>
-<p>Hello, my name is Dylan James McDowell. I am Financial Economics undergraduate with hopes to pursue a graduate degree in Mathematical Statistics with a research focus in Bayesian Methods &amp; Decision Theory. I love coding in <a href="https://twitter.com/hashtag/rstats?src=hash">#rstats</a> and <a href="https://twitter.com/hashtag/Python?src=hash">#python</a> and currently am learning Stan. I love to read, write, and have #woahdude deep discussions with friends. I named this blog “Uninformed Priors” because <strong>1)</strong> I’m really interested in Bayesian Statistics and <strong>2)</strong> It desribes the way I often approach life with an open mind. Currently, I work as a Data Scientist &amp; Project Manager for a non-profit consulting firm primarily on agronomy and econometric projects.</p>
-<hr />
+  <div class="pure-u-11-12 pure-u-md-2-3">
+    <div class="post">
 
-	</div>
-	  <p class="posts-name">Recent posts:</p>
-	  <ul class="posts">
-		
-		
-		
-		<li>
-		  
-		  <a class="post-list" href="/posts/using-purrr-to-wrangle-and-clean-economic-data/">Using purrr to wrangle and clean economic data</a>
+      <div class="post-title">
+        <p class="footnote">
+        <time class="">04-20-2018</time>
+        
+        
+        |
+        
+        
+        tags: [ <a href="/tags/purrr">purrr</a> <a href="/tags/economics">economics</a> <a href="/tags/tidyverse">tidyverse</a> ]
+        
 
-		  <p class="footnote">
-			<time datetime="04-20-2018T00:00:00Z">04-20-2018</time>
+        
+        categories: [<a href="/categories/posts">Posts</a> ]
+        
 
-			
-		  |	
-			
+        
+        </p>
+        <h1>Using purrr to wrangle and clean economic data</h1>
+      </div>
 
-			
-			tags: [ <a href="/tags/purrr">purrr</a> <a href="/tags/economics">economics</a> <a href="/tags/tidyverse">tidyverse</a> ]
-			
+      <div class="post-content">
+        <p>I’m currently working on building a quantitative macroeconomics course with a professor of mine. The goal of the course is to introduce students within the Economics department to programming in Python and R. This is a big step for our department. Even though we have always been a fairly math heavy econ degree, the department has been stuck behind the curve in teaching students new and to date technicial skills. This professor, along with my help, wants to move the courses away from teachin STATA and Excel to equiping students with proper data analysis tools for the workforce and academia.</p>
+<p>The course is focusing on the material found in <a href="http://books.wwnorton.com/books/webad.aspx?id=4294993402">Macroeconomics 4th Edition by Charles I. Jones</a> which, itself, is not focused on programming at all. We want to build a programming curriculum around the concepts in the book so students can stay interested in application of these skills.</p>
+<p>One of the first assignments asks the students to read in data regarding per capita GDP of several countries around the world and greate a graphic showing the change in per capita GDP over time. The author in the book directs students to the data found at: <a href="http://web.stanford.edu/~chadj/snapshots.pdf">Country Snapshots 9.0</a>, which is a wonderful PDF document containing example plots and links to the excel files storing these economic data.</p>
+<p>My professor is worried about changes to the datasets in the future and has asked me to create a repository of pre-cleaned datasets that the students can access without worrying about the data disapearing into the future. Since the class is only focused on the basics of programming, I figured I would clean up the data and store it in a nice table for students to access later.</p>
+<p>In this write up we’ll use <code>library(purrr)</code> to automate this retrevial of data. Some of the funcitons that we’ll use from purrr are <code>compact()</code>, <code>map_df()</code>, and <code>possibly()</code> to ensure that our code is as dynamic as possible. So let’s begin!</p>
+<p><strong>Here are some libraries we’ll need to finish this task:</strong></p>
+<pre class="r"><code>library(tidyverse) # Includes purrr &amp; %&gt;% operator
+library(rio) # Will make reading in our .xls files quick and simple
+library(rvest) # We&#39;ll utilize web scraping for a brief moment to get a list of country codes
+library(janitor) # Awesome package that makes cleaning messy data really easy</code></pre>
+<p>The students will be asked to create a plot from the data of any country of there choosing from <a href="http://web.stanford.edu/~chadj/countrycodes6.3">this list of country codes</a>. This means that we’ll need every possible country dataset pulled down and cleaned for students to utilize. Since we want to make sure we have the most recent list of countries everytime we run this code we’re going to use <code>library(rvest)</code> to scrape this list and clean up it so we can use the sweet TLA (Three-Letter-Abreviation) country codes hidden inside 😋😋😋.</p>
+<pre class="r"><code># Rcode to go and fetch country codes
+# Note: Wrapping the expression in parentheses &quot;()&quot; just evaluates and prints
+# the results on the spot.
+(country_codes &lt;- read_html(&quot;http://web.stanford.edu/~chadj/countrycodes6.3&quot;) %&gt;% 
+  html_text() %&gt;% 
+  str_extract_all(&quot;[A-Z]{3}&quot;) %&gt;% 
+  unlist() %&gt;% 
+  .[order(.)])</code></pre>
+<pre><code>##   [1] &quot;AFG&quot; &quot;AGO&quot; &quot;ALB&quot; &quot;ARE&quot; &quot;ARG&quot; &quot;ARM&quot; &quot;ATG&quot; &quot;AUS&quot; &quot;AUT&quot; &quot;AZE&quot; &quot;BDI&quot;
+##  [12] &quot;BEL&quot; &quot;BEN&quot; &quot;BFA&quot; &quot;BGD&quot; &quot;BGR&quot; &quot;BHR&quot; &quot;BHS&quot; &quot;BIH&quot; &quot;BLR&quot; &quot;BLZ&quot; &quot;BMU&quot;
+##  [23] &quot;BOL&quot; &quot;BRA&quot; &quot;BRB&quot; &quot;BRN&quot; &quot;BTN&quot; &quot;BWA&quot; &quot;CAF&quot; &quot;CAN&quot; &quot;CHE&quot; &quot;CHL&quot; &quot;CHN&quot;
+##  [34] &quot;CIV&quot; &quot;CMR&quot; &quot;COG&quot; &quot;COL&quot; &quot;COM&quot; &quot;CPV&quot; &quot;CRI&quot; &quot;CUB&quot; &quot;CYP&quot; &quot;CZE&quot; &quot;DJI&quot;
+##  [45] &quot;DMA&quot; &quot;DNK&quot; &quot;DOM&quot; &quot;DZA&quot; &quot;ECU&quot; &quot;EGY&quot; &quot;ERI&quot; &quot;ESP&quot; &quot;EST&quot; &quot;ETH&quot; &quot;FIN&quot;
+##  [56] &quot;FJI&quot; &quot;FRA&quot; &quot;FSM&quot; &quot;GAB&quot; &quot;GBR&quot; &quot;GEO&quot; &quot;GER&quot; &quot;GHA&quot; &quot;GIN&quot; &quot;GMB&quot; &quot;GNB&quot;
+##  [67] &quot;GNQ&quot; &quot;GRC&quot; &quot;GRD&quot; &quot;GTM&quot; &quot;GUY&quot; &quot;HKG&quot; &quot;HND&quot; &quot;HRV&quot; &quot;HTI&quot; &quot;HUN&quot; &quot;IDN&quot;
+##  [78] &quot;IND&quot; &quot;IRL&quot; &quot;IRN&quot; &quot;IRQ&quot; &quot;ISL&quot; &quot;ISR&quot; &quot;ITA&quot; &quot;JAM&quot; &quot;JOR&quot; &quot;JPN&quot; &quot;KAZ&quot;
+##  [89] &quot;KEN&quot; &quot;KGZ&quot; &quot;KHM&quot; &quot;KIR&quot; &quot;KNA&quot; &quot;KOR&quot; &quot;KWT&quot; &quot;LAO&quot; &quot;LBN&quot; &quot;LBR&quot; &quot;LBY&quot;
+## [100] &quot;LCA&quot; &quot;LKA&quot; &quot;LSO&quot; &quot;LTU&quot; &quot;LUX&quot; &quot;LVA&quot; &quot;MAC&quot; &quot;MAR&quot; &quot;MDA&quot; &quot;MDG&quot; &quot;MDV&quot;
+## [111] &quot;MEX&quot; &quot;MHL&quot; &quot;MKD&quot; &quot;MLI&quot; &quot;MLT&quot; &quot;MNE&quot; &quot;MNG&quot; &quot;MOZ&quot; &quot;MRT&quot; &quot;MUS&quot; &quot;MWI&quot;
+## [122] &quot;MYS&quot; &quot;NAM&quot; &quot;NER&quot; &quot;NGA&quot; &quot;NIC&quot; &quot;NLD&quot; &quot;NOR&quot; &quot;NPL&quot; &quot;NZL&quot; &quot;OMN&quot; &quot;PAK&quot;
+## [133] &quot;PAN&quot; &quot;PER&quot; &quot;PHL&quot; &quot;PLW&quot; &quot;PNG&quot; &quot;POL&quot; &quot;PRI&quot; &quot;PRT&quot; &quot;PRY&quot; &quot;QAT&quot; &quot;ROM&quot;
+## [144] &quot;RUS&quot; &quot;RWA&quot; &quot;SAU&quot; &quot;SDN&quot; &quot;SEN&quot; &quot;SGP&quot; &quot;SLB&quot; &quot;SLE&quot; &quot;SLV&quot; &quot;SOM&quot; &quot;SRB&quot;
+## [155] &quot;STP&quot; &quot;SUR&quot; &quot;SVK&quot; &quot;SVN&quot; &quot;SWE&quot; &quot;SWZ&quot; &quot;SYC&quot; &quot;SYR&quot; &quot;TCD&quot; &quot;TGO&quot; &quot;THA&quot;
+## [166] &quot;TJK&quot; &quot;TKM&quot; &quot;TLS&quot; &quot;TON&quot; &quot;TTO&quot; &quot;TUN&quot; &quot;TUR&quot; &quot;TWN&quot; &quot;TZA&quot; &quot;UGA&quot; &quot;UKR&quot;
+## [177] &quot;URY&quot; &quot;USA&quot; &quot;UZB&quot; &quot;VCT&quot; &quot;VEN&quot; &quot;VNM&quot; &quot;VUT&quot; &quot;WSM&quot; &quot;YEM&quot; &quot;ZAF&quot; &quot;ZAR&quot;
+## [188] &quot;ZMB&quot; &quot;ZWE&quot;</code></pre>
+<p>Perfect! If you step back through the code and run it line by line you’ll see why we needed to use a regular expression to pull all the TLA’s from the web scraping results. The final pipe statements just orders the TLA’s in alphbetical order. Now we can use these codes to loop through the urls that hold all the excel files (i.e. <code>http://www.stanford.edu/~chadj/snapshots/TLA.xls</code>). But before we do that, let’s write a function to handle all the data munging and cleaning we’ll need.</p>
+<p><strong>Taking a look at the USA excel file shows some cleaning needs to be done</strong></p>
+<p><img src="../../img/usa_dat.png" /></p>
+<p>Right off the bat we can see we’ll need to skip the first few lines of code. There also appears to be a row of blank values after each of the headers. We’ll want to make sure we get rid of unneccesary missing data and ensure that each column is correctly typed as numeric. Since our goal is to use purrr to eventually loop through all possible countries, we’ll also want to create a column of the what country these data belong to. This will help when it comes to plot and store these data.</p>
+<pre class="r"><code>read_and_clean &lt;- function(country_code = &quot;USA&quot;){
+  dat_url &lt;- paste0(&quot;http://www.stanford.edu/~chadj/snapshots/&quot;, country_code, &quot;.xls&quot;)
+  import(dat_url, skip = 9) %&gt;% 
+    clean_names() %&gt;% # Great function from library(janitor)
+    na.omit() %&gt;% 
+    filter(population != &quot;NaN&quot;) %&gt;% 
+    mutate_all(as.numeric) %&gt;% 
+    mutate(country = country_code)
+}</code></pre>
+<p><strong>A quick run of this function with “USA” as the default country code shows nice and tidy output:</strong></p>
+<pre class="r"><code>head(read_and_clean())</code></pre>
+<pre><code>##   year population y_pop y_pop_us_100 y_wkr y_wkr_us_100 growth_100     i_y
+## 1 1950   155.5635 14619          100 36193          100        NaN 23.1236
+## 2 1951   158.2269 15445          100 37550          100     5.4959 24.2738
+## 3 1952   160.9597 15696          100 38363          100     1.6114 24.3668
+## 4 1953   163.6476 16150          100 39573          100     2.8544 24.5426
+## 5 1954   166.5511 15814          100 40152          100    -2.1063 23.5018
+## 6 1955   169.5189 16723          100 41979          100     5.5920 24.8036
+##       g_y ed_att    nx_y  x_m_y ex_rate country
+## 1 10.2318   8.13  0.1277 8.2844       1     USA
+## 2 12.6842    NaN  0.8968 9.5905       1     USA
+## 3 14.5191    NaN  0.2033 8.9232       1     USA
+## 4 14.8478    NaN -0.4441 8.1024       1     USA
+## 5 13.9241    NaN -0.0356 8.0404       1     USA
+## 6 12.8362   8.50 -0.0455 8.2868       1     USA</code></pre>
+<p>Now given that I have ran and figured out all this code, for this next part I’m going to do a little hand waving. Apparently, there are some countries in our <code>country_codes</code> list that don’t keep track of this data. Therefore, in my initial attempts to use <code>map()</code> to iterate across all TLA’s, it would error out when running across a country that didn’t have a corresponding excel file. This is why we need to use the <code>possibly()</code> function. For more info run <code>?purrr::possibly()</code> in your R console.</p>
+<pre class="r"><code># Now we may &quot;possibly&quot; be able to run this code without it stopping lol
+possibly_read_and_clean &lt;- possibly(read_and_clean, otherwise = NULL)</code></pre>
+<p><strong>At this point we have three things left to do:</strong></p>
+<ol style="list-style-type: decimal">
+<li><p>Iterate through all country TLA’s to create a list of data.frames.</p></li>
+<li><p>Given the missing files for some countries, drop the inevitible NA’s from our list using <code>purrr:compact()</code></p></li>
+<li><p>Use <code>purrr::map_df()</code> and <code>bind_rows()</code> to create one large data.frame for storing.</p></li>
+</ol>
+<pre class="r"><code>final_clean_dat &lt;- purrr::map(country_codes, ~ possibly_read_and_clean(.x)) %&gt;% 
+  compact() %&gt;% 
+  map_df(bind_rows)</code></pre>
+<p>Yay! 😄 Now we have one large dataset that can be updated at anypoint in time but also will remain unchanged in case the datasets ever go offline. This code will allow the students to focus more on the applications at hand and save the data cleaning for a later class. Since we’ve made it this far, let’s finish off with a plot!</p>
+<pre class="r"><code>final_clean_dat %&gt;% 
+  filter(country %in% c(&quot;USA&quot;,&quot;RUS&quot;,&quot;CHN&quot;,&quot;JPN&quot;)) %&gt;% 
+  ggplot(aes(x = year, y = y_pop, 
+             group = country, color = country)) +
+  geom_line(size = 1.5) +
+  scale_color_manual(values = c(&quot;#c67c73&quot;,&quot;#356984&quot;,&quot;#ebe948&quot;,&quot;#cccccc&quot;)) +
+  scale_y_continuous(labels = scales::comma) +
+  labs(title = &quot;Country Snapshot, per capitia GDP 1960-2014&quot;,
+       subtitle = &quot;Graphic displays GDP/Pop for the countries of: United States, Russia, China, and Japan&quot;,
+       x = &quot;Year&quot;, y = &quot;per capita GDP&quot;) +
+  theme_bw() +
+  theme(panel.background = element_rect(color = &quot;#fcfcfc&quot;),
+        legend.position = &quot;bottom&quot;,
+        legend.title = element_blank())</code></pre>
+<p><img src="/posts/2018-04-20-using-purrr-to-wrangle-and-clean-economic-data_files/figure-html/unnamed-chunk-8-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>That’s it, thanks for reading. Hopefully you can gained a little better understanding of the usefullness of purrr and the functions it contains. You can find a gist of the script at my <a href="https://gist.github.com/dylanjm/474ab30a18a96e19c139d19801f0acc2">github account</a>. ∎</p>
 
-			
-			categories: [ <a href="/categories/posts">Posts</a> ]
-			
-
-			
-
-		  </p>
-		</li>
-		
-		
-		
-		
-		
-		<li>
-		  
-		  <a class="post-list" href="/posts/tidy-tuesday-week-01/">Tidy Tuesday Week 01</a>
-
-		  <p class="footnote">
-			<time datetime="04-16-2018T00:00:00Z">04-16-2018</time>
-
-			
-		  |	
-			
-
-			
-			tags: [ <a href="/tags/tidytuesday">TidyTuesday</a> <a href="/tags/rstats">rstats</a> ]
-			
-
-			
-			categories: [ <a href="/categories/posts">Posts</a> ]
-			
-
-			
-
-		  </p>
-		</li>
-		
-		
-	  </ul>
-	</div>
-	</div>
+      </div>
+    </div>
+  </div>
   <div class="pure-u-1-24 pure-u-md-1-6"></div>
 </div>
 
@@ -514,7 +546,7 @@ body {
 
         </ul>
         <a href="#" class="pure-menu-link pull-right" id="gototop-btn">↑↑</a>
-        <a href="/index.xml" class="pure-menu-link pull-right">RSS</a>
+        <a href="" class="pure-menu-link pull-right">RSS</a>
       </div>
       
     </div>

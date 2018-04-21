@@ -7,10 +7,28 @@
     <generator>Hugo -- gohugo.io</generator>
     <managingEditor>dylan.mcdowell226@gmail.com (Dylan McDowell)</managingEditor>
     <webMaster>dylan.mcdowell226@gmail.com (Dylan McDowell)</webMaster>
-    <lastBuildDate>Mon, 16 Apr 2018 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Fri, 20 Apr 2018 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="/tags/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Economics</title>
+      <link>/tags/economics/</link>
+      <pubDate>Fri, 20 Apr 2018 00:00:00 +0000</pubDate>
+      <author>dylan.mcdowell226@gmail.com (Dylan McDowell)</author>
+      <guid>/tags/economics/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Purrr</title>
+      <link>/tags/purrr/</link>
+      <pubDate>Fri, 20 Apr 2018 00:00:00 +0000</pubDate>
+      <author>dylan.mcdowell226@gmail.com (Dylan McDowell)</author>
+      <guid>/tags/purrr/</guid>
+      <description></description>
+    </item>
     
     <item>
       <title>Rstats</title>
@@ -27,6 +45,15 @@
       <pubDate>Mon, 16 Apr 2018 00:00:00 +0000</pubDate>
       <author>dylan.mcdowell226@gmail.com (Dylan McDowell)</author>
       <guid>/tags/tidytuesday/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Tidyverse</title>
+      <link>/tags/tidyverse/</link>
+      <pubDate>Fri, 20 Apr 2018 00:00:00 +0000</pubDate>
+      <author>dylan.mcdowell226@gmail.com (Dylan McDowell)</author>
+      <guid>/tags/tidyverse/</guid>
       <description></description>
     </item>
     

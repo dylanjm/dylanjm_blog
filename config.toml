@@ -8,8 +8,6 @@ ignoreFiles = ["\\.Rmd$", "\\.Rmarkdown$", "_files$", "_cache$"]
 # enable emoji use, i.e. :smile:
 enableEmoji = true
 
-
-
 [params]
   # Enables syntax highlighting
   highlight = true 
