@@ -412,17 +412,17 @@ body {
       </div>
 
       <div class="post-content">
-        <p>I’m currently working on building a quantitative macroeconomics course with a professor of mine. The goal of the course is to introduce students within the Economics department to programming in Python and R. This is a big step for our department. Even though we have always been a fairly math heavy econ degree, the department has been stuck behind the curve in teaching students new and up-to-date technicial skills. This professor, along with my help, wants to move the courses away from teaching STATA and Excel, to equiping students with proper data analysis tools for the workforce and academia.</p>
+        <p>I’m currently working on building a quantitative macroeconomics course with a professor of mine. The goal of the course is to introduce students within the Economics department to programming in Python and R. This is a big step for our department. Even though we have always been a fairly math heavy econ degree, the department has been stuck behind the curve in teaching students new and up-to-date technical skills. This professor, along with my help, wants to move the courses away from teaching STATA and Excel, to equipping students with proper data analysis tools for the workforce and academia.</p>
 <p>The course is focusing on the material found in <a href="http://books.wwnorton.com/books/webad.aspx?id=4294993402">Macroeconomics 4th Edition by Charles I. Jones</a> which, itself, is not focused on programming at all. We want to build a programming curriculum around the concepts in the book so students can stay interested in the application of these concepts.</p>
-<p>One of the first assignments asks the students to read in data regarding per capita GDP of several countries around the world and greate a graphic showing the change in per capita GDP over time. The author in the book directs students to the data found at: <a href="http://web.stanford.edu/~chadj/snapshots.pdf">Country Snapshots 9.0</a>, which is a wonderful PDF document containing example plots and links to the excel files storing these economic data.</p>
-<p>My professor is worried about changes to the datasets in the future and has asked me to create a repository of pre-cleaned datasets that the students can access without worrying about the data disapearing into the future. Since the class is only focused on the basics of programming, I figured I would clean up the data and store it in a nice table for students to access later.</p>
-<p>In this write up we’ll use <code>library(purrr)</code> to automate this retrevial of data. Some of the funcitons that we’ll use from purrr are <code>compact()</code>, <code>map_df()</code>, and <code>possibly()</code> to ensure that our code is as dynamic as possible. So let’s begin!</p>
+<p>One of the first assignments asks the students to read in data regarding per capita GDP of several countries around the world and create a graphic showing the change in per capita GDP over time. The author in the book directs students to the data found at: <a href="http://web.stanford.edu/~chadj/snapshots.pdf">Country Snapshots 9.0</a>, which is a wonderful PDF document containing example plots and links to the excel files storing these economic data.</p>
+<p>My professor is worried about changes to the data sets in the future and has asked me to create a repository of pre-cleaned data sets that the students can access without worrying about the data disappearing into the future. Since the class is only focused on the basics of programming, I figured I would clean up the data and store it in a nice table for students to access later.</p>
+<p>In this write up we’ll use <code>library(purrr)</code> to automate this retrieval of data. Some of the functions that we’ll use from purrr are <code>compact()</code>, <code>map_df()</code>, and <code>possibly()</code> to ensure that our code is as dynamic as possible. So let’s begin!</p>
 <p><strong>Here are some libraries we’ll need to finish this task:</strong></p>
 <pre class="r"><code>library(tidyverse) # Includes purrr &amp; %&gt;% operator
 library(rio) # Will make reading in our .xls files quick and simple
 library(rvest) # We&#39;ll utilize web scraping for a brief moment to get a list of country codes
 library(janitor) # Awesome package that makes cleaning messy data really easy</code></pre>
-<p>The students will be asked to create a plot from the data of any country of their choosing from <a href="http://web.stanford.edu/~chadj/countrycodes6.3">this list of country codes</a>. This means that we’ll need every possible country dataset pulled down and cleaned for students to utilize. Since we want to make sure we have the most recent list of countries everytime we run this code, we’re going to use <code>library(rvest)</code> to scrape this list and clean up it so we can use the sweet TLA (Three-Letter-Abreviation) country codes hidden inside 😋😋😋.</p>
+<p>The students will be asked to create a plot from the data of any country of their choosing from <a href="http://web.stanford.edu/~chadj/countrycodes6.3">this list of country codes</a>. This means that we’ll need every possible country data set pulled down and cleaned for students to utilize. Since we want to make sure we have the most recent list of countries every time we run this code, we’re going to use <code>library(rvest)</code> to scrape this list and clean up it so we can use the sweet TLA (Three-Letter-Abbreviation) country codes hidden inside 😋😋😋.</p>
 <pre class="r"><code># Rcode to go and fetch country codes
 # Note: Wrapping the expression in parentheses &quot;()&quot; just evaluates and prints
 # the results on the spot.
@@ -449,10 +449,10 @@ library(janitor) # Awesome package that makes cleaning messy data really easy</c
 ## [166] &quot;TJK&quot; &quot;TKM&quot; &quot;TLS&quot; &quot;TON&quot; &quot;TTO&quot; &quot;TUN&quot; &quot;TUR&quot; &quot;TWN&quot; &quot;TZA&quot; &quot;UGA&quot; &quot;UKR&quot;
 ## [177] &quot;URY&quot; &quot;USA&quot; &quot;UZB&quot; &quot;VCT&quot; &quot;VEN&quot; &quot;VNM&quot; &quot;VUT&quot; &quot;WSM&quot; &quot;YEM&quot; &quot;ZAF&quot; &quot;ZAR&quot;
 ## [188] &quot;ZMB&quot; &quot;ZWE&quot;</code></pre>
-<p>Perfect! If you step back through the code and run it line by line you’ll see why we needed to use a regular expression to pull all the TLA’s from the web scraping results. The final pipe statements just orders the TLA’s in alphbetical order. Now we can use these codes to loop through the urls that hold all the excel files (i.e. <code>http://www.stanford.edu/~chadj/snapshots/TLA.xls</code>). But before we do that, let’s write a function to handle all the data munging and cleaning we’ll need.</p>
+<p>Perfect! If you step back through the code and run it line by line you’ll see why we needed to use a regular expression to pull all the TLA’s from the web scraping results. The final pipe statements just orders the TLA’s in alphabetical order. Now we can use these codes to loop through the urls that hold all the excel files (i.e. <code>http://www.stanford.edu/~chadj/snapshots/TLA.xls</code>). But before we do that, let’s write a function to handle all the data munging and cleaning we’ll need.</p>
 <p><strong>Taking a look at the USA excel file shows some cleaning needs to be done</strong></p>
 <p><img src="../../img/usa_dat.png" /></p>
-<p>Right off the bat we can see we’ll need to skip the first 9 lines at the top of the excel file. There also appears to be a row of blank values after each of the headers. We’ll want to make sure we get rid of unneccesary missing data and ensure that each column is correctly typed as numeric. Since our goal is to use purrr to eventually loop through all possible countries, we’ll also want to create a column of the what country these data belong to. This will help when it comes to plotting and storing these data.</p>
+<p>Right off the bat we can see we’ll need to skip the first 9 lines at the top of the excel file. There also appears to be a row of blank values after each of the headers. We’ll want to make sure we get rid of unnecessary missing data and ensure that each column is correctly typed as numeric. Since our goal is to use purrr to eventually loop through all possible countries, we’ll also want to create a column of the what country these data belong to. This will help when it comes to plotting and storing these data.</p>
 <pre class="r"><code>read_and_clean &lt;- function(country_code = &quot;USA&quot;){
   dat_url &lt;- paste0(&quot;http://www.stanford.edu/~chadj/snapshots/&quot;, country_code, &quot;.xls&quot;)
   import(dat_url, skip = 9) %&gt;% 
@@ -484,14 +484,14 @@ possibly_read_and_clean &lt;- possibly(read_and_clean, otherwise = NULL)</code><
 <p><strong>At this point we have three things left to do:</strong></p>
 <ol style="list-style-type: decimal">
 <li><p>Iterate through all country TLA’s to create a list of data.frames.</p></li>
-<li><p>Given the missing files for some countries, drop the inevitible NA’s from our list using <code>purrr:compact()</code></p></li>
+<li><p>Given the missing files for some countries, drop the inevitable NA’s from our list using <code>purrr:compact()</code></p></li>
 <li><p>Use <code>purrr::map_df()</code> and <code>bind_rows()</code> to create one large data.frame for storing.</p></li>
 </ol>
 <pre class="r"><code>final_clean_dat &lt;- purrr::map(country_codes, 
                               ~ possibly_read_and_clean(country_code = .x)) %&gt;% 
   compact() %&gt;% 
   map_df(bind_rows)</code></pre>
-<p>Yay! 😄 Now we have one large dataset that can be updated at any point in time, but also will remain unchanged in case the datasets ever go offline. This code will allow the students to focus more on the applications at hand and save the data cleaning for a later class. Since we’ve made it this far, let’s finish off with a plot!</p>
+<p>Yay! 😄 Now we have one large data set that can be updated at any point in time, but also will remain unchanged in case the data sets ever go offline. This code will allow the students to focus more on the applications at hand and save the data cleaning for a later class. Since we’ve made it this far, let’s finish off with a plot!</p>
 <pre class="r"><code>final_clean_dat %&gt;% 
   filter(country %in% c(&quot;USA&quot;,&quot;RUS&quot;,&quot;CHN&quot;,&quot;JPN&quot;)) %&gt;% 
   ggplot(aes(x = year, y = y_pop, 
@@ -509,7 +509,7 @@ possibly_read_and_clean &lt;- possibly(read_and_clean, otherwise = NULL)</code><
         legend.title = element_blank(),
         legend.background = element_rect(fill=&quot;#fcfcfc&quot;))</code></pre>
 <p><img src="/posts/2018-04-20-using-purrr-to-wrangle-and-clean-economic-data_files/figure-html/unnamed-chunk-8-1.png" width="672" style="display: block; margin: auto;" /></p>
-<p>That’s it, thanks for reading. Hopefully you can gained a little better understanding of the usefullness of purrr and the functions it contains. You can find a gist of the script at my <a href="https://gist.github.com/dylanjm/474ab30a18a96e19c139d19801f0acc2">github account</a>. ∎</p>
+<p>That’s it, thanks for reading. Hopefully you can gained a little better understanding of the usefulness of purrr and the functions it contains. You can find a gist of the script at my <a href="https://gist.github.com/dylanjm/474ab30a18a96e19c139d19801f0acc2">github account</a>. ∎</p>
 
       </div>
     </div>

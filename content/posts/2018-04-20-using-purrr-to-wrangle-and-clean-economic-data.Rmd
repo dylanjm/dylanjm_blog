@@ -11,15 +11,15 @@ tags:
   - tidyverse
 ---
 
-I'm currently working on building a quantitative macroeconomics course with a professor of mine. The goal of the course is to introduce students within the Economics department to programming in Python and R. This is a big step for our department. Even though we have always been a fairly math heavy econ degree, the department has been stuck behind the curve in teaching students new and up-to-date technicial skills. This professor, along with my help, wants to move the courses away from teaching STATA and Excel, to equiping students with proper data analysis tools for the workforce and academia. 
+I'm currently working on building a quantitative macroeconomics course with a professor of mine. The goal of the course is to introduce students within the Economics department to programming in Python and R. This is a big step for our department. Even though we have always been a fairly math heavy econ degree, the department has been stuck behind the curve in teaching students new and up-to-date technical skills. This professor, along with my help, wants to move the courses away from teaching STATA and Excel, to equipping students with proper data analysis tools for the workforce and academia. 
 
 The course is focusing on the material found in [Macroeconomics 4th Edition by Charles I. Jones](http://books.wwnorton.com/books/webad.aspx?id=4294993402) which, itself, is not focused on programming at all. We want to build a programming curriculum around the concepts in the book so students can stay interested in the application of these concepts. 
 
-One of the first assignments asks the students to read in data regarding per capita GDP of several countries around the world and greate a graphic showing the change in per capita GDP over time. The author in the book directs students to the data found at: [Country Snapshots 9.0](http://web.stanford.edu/~chadj/snapshots.pdf), which is a wonderful PDF document containing example plots and links to the excel files storing these economic data. 
+One of the first assignments asks the students to read in data regarding per capita GDP of several countries around the world and create a graphic showing the change in per capita GDP over time. The author in the book directs students to the data found at: [Country Snapshots 9.0](http://web.stanford.edu/~chadj/snapshots.pdf), which is a wonderful PDF document containing example plots and links to the excel files storing these economic data. 
 
-My professor is worried about changes to the datasets in the future and has asked me to create a repository of pre-cleaned datasets that the students can access without worrying about the data disapearing into the future. Since the class is only focused on the basics of programming, I figured I would clean up the data and store it in a nice table for students to access later. 
+My professor is worried about changes to the data sets in the future and has asked me to create a repository of pre-cleaned data sets that the students can access without worrying about the data disappearing into the future. Since the class is only focused on the basics of programming, I figured I would clean up the data and store it in a nice table for students to access later. 
 
-In this write up we'll use `library(purrr)` to automate this retrevial of data. Some of the funcitons that we'll use from purrr are `compact()`, `map_df()`, and `possibly()` to ensure that our code is as dynamic as possible. So let's begin!
+In this write up we'll use `library(purrr)` to automate this retrieval of data. Some of the functions that we'll use from purrr are `compact()`, `map_df()`, and `possibly()` to ensure that our code is as dynamic as possible. So let's begin!
 
 __Here are some libraries we'll need to finish this task:__
 ```{r, message=FALSE}
@@ -29,7 +29,7 @@ library(rvest) # We'll utilize web scraping for a brief moment to get a list of 
 library(janitor) # Awesome package that makes cleaning messy data really easy
 ```
 
-The students will be asked to create a plot from the data of any country of their choosing from [this list of country codes](http://web.stanford.edu/~chadj/countrycodes6.3). This means that we'll need every possible country dataset pulled down and cleaned for students to utilize. Since we want to make sure we have the most recent list of countries everytime we run this code, we're going to use `library(rvest)` to scrape this list and clean up it so we can use the sweet TLA (Three-Letter-Abreviation) country codes hidden inside 😋😋😋. 
+The students will be asked to create a plot from the data of any country of their choosing from [this list of country codes](http://web.stanford.edu/~chadj/countrycodes6.3). This means that we'll need every possible country data set pulled down and cleaned for students to utilize. Since we want to make sure we have the most recent list of countries every time we run this code, we're going to use `library(rvest)` to scrape this list and clean up it so we can use the sweet TLA (Three-Letter-Abbreviation) country codes hidden inside 😋😋😋. 
 
 ```{r}
 # Rcode to go and fetch country codes
@@ -42,13 +42,13 @@ The students will be asked to create a plot from the data of any country of thei
   .[order(.)])
 ```
 
-Perfect! If you step back through the code and run it line by line you'll see why we needed to use a regular expression to pull all the TLA's from the web scraping results. The final pipe statements just orders the TLA's in alphbetical order. Now we can use these codes to loop through the urls that hold all the excel files (i.e. `http://www.stanford.edu/~chadj/snapshots/TLA.xls`). But before we do that, let's write a function to handle all the data munging and cleaning we'll need. 
+Perfect! If you step back through the code and run it line by line you'll see why we needed to use a regular expression to pull all the TLA's from the web scraping results. The final pipe statements just orders the TLA's in alphabetical order. Now we can use these codes to loop through the urls that hold all the excel files (i.e. `http://www.stanford.edu/~chadj/snapshots/TLA.xls`). But before we do that, let's write a function to handle all the data munging and cleaning we'll need. 
 
 __Taking a look at the USA excel file shows some cleaning needs to be done__
 
 ![](../../img/usa_dat.png)
 
-Right off the bat we can see we'll need to skip the first 9 lines at the top of the excel file. There also appears to be a row of blank values after each of the headers. We'll want to make sure we get rid of unneccesary missing data and ensure that each column is correctly typed as numeric. Since our goal is to use purrr to eventually loop through all possible countries, we'll also want to create a column of the what country these data belong to. This will help when it comes to plotting and storing these data.
+Right off the bat we can see we'll need to skip the first 9 lines at the top of the excel file. There also appears to be a row of blank values after each of the headers. We'll want to make sure we get rid of unnecessary missing data and ensure that each column is correctly typed as numeric. Since our goal is to use purrr to eventually loop through all possible countries, we'll also want to create a column of the what country these data belong to. This will help when it comes to plotting and storing these data.
 
 ```{r}
 read_and_clean <- function(country_code = "USA"){
@@ -79,7 +79,7 @@ __At this point we have three things left to do:__
 
 1. Iterate through all country TLA's to create a list of data.frames.
 
-2. Given the missing files for some countries, drop the inevitible NA's from our list using `purrr:compact()`
+2. Given the missing files for some countries, drop the inevitable NA's from our list using `purrr:compact()`
 
 3. Use `purrr::map_df()` and `bind_rows()` to create one large data.frame for storing. 
 
@@ -90,7 +90,7 @@ final_clean_dat <- purrr::map(country_codes,
   map_df(bind_rows)
 ```
 
-Yay! 😄 Now we have one large dataset that can be updated at any point in time, but also will remain unchanged in case the datasets ever go offline. This code will allow the students to focus more on the applications at hand and save the data cleaning for a later class. Since we've made it this far, let's finish off with a plot!
+Yay! 😄 Now we have one large data set that can be updated at any point in time, but also will remain unchanged in case the data sets ever go offline. This code will allow the students to focus more on the applications at hand and save the data cleaning for a later class. Since we've made it this far, let's finish off with a plot!
 
 ```{r, include=FALSE}
 final_clean_dat <- read_csv("../../data/final_gdp_data.csv")
@@ -115,4 +115,4 @@ final_clean_dat %>%
         legend.background = element_rect(fill="#fcfcfc"))
 ```
 
-That's it, thanks for reading. Hopefully you can gained a little better understanding of the usefullness of purrr and the functions it contains. You can find a gist of the script at my [github account](https://gist.github.com/dylanjm/474ab30a18a96e19c139d19801f0acc2). ∎
+That's it, thanks for reading. Hopefully you can gained a little better understanding of the usefulness of purrr and the functions it contains. You can find a gist of the script at my [github account](https://gist.github.com/dylanjm/474ab30a18a96e19c139d19801f0acc2). ∎
