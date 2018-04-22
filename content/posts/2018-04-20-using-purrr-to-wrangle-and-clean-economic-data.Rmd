@@ -48,7 +48,7 @@ __Taking a look at the USA excel file shows some cleaning needs to be done__
 
 ![](../../img/usa_dat.png)
 
-Right off the bat we can see we'll need to skip the first 9 lines at the top of the excel file. There also appears to be a row of blank values after each of the headers. We'll want to make sure we get rid of unneccesary missing data and ensure that each column is correctly typed as numeric. Since our goal is to use purrr to eventually loop through all possible countries, we'll also want to create a column of the what country these data belong to. This will help when it comes to plottin and storing these data.
+Right off the bat we can see we'll need to skip the first 9 lines at the top of the excel file. There also appears to be a row of blank values after each of the headers. We'll want to make sure we get rid of unneccesary missing data and ensure that each column is correctly typed as numeric. Since our goal is to use purrr to eventually loop through all possible countries, we'll also want to create a column of the what country these data belong to. This will help when it comes to plotting and storing these data.
 
 ```{r}
 read_and_clean <- function(country_code = "USA"){
