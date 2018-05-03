@@ -24,7 +24,7 @@ The online community, R for Data Science, has started what's called #TidyTuesday
 # Data Cleaning
 Let's begin by loading in our data and taking a quick peek at a few columns:
 ```{r}
-tuition.raw <- readxl::read_xlsx("../../data/us_avg_tuition.xlsx") %>% 
+tuition.raw <- read_xlsx(here::here("data/us_avg_tuition.xlsx")) %>% 
   rename(state = State) # read in raw data and rename a column
 
 pander::pander(head(tuition.raw[,1:6]))

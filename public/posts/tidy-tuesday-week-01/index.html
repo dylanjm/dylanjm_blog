@@ -338,7 +338,7 @@ body {
   
   
 
-  <meta name="generator" content="Hugo 0.38" />
+  <meta name="generator" content="Hugo 0.40.2" />
 
   
   
@@ -424,7 +424,7 @@ library(ggthemes) </code></pre>
 <div id="data-cleaning" class="section level1">
 <h1>Data Cleaning</h1>
 <p>Let’s begin by loading in our data and taking a quick peek at a few columns:</p>
-<pre class="r"><code>tuition.raw &lt;- readxl::read_xlsx(&quot;../../data/us_avg_tuition.xlsx&quot;) %&gt;% 
+<pre class="r"><code>tuition.raw &lt;- read_xlsx(here::here(&quot;data/us_avg_tuition.xlsx&quot;)) %&gt;% 
   rename(state = State) # read in raw data and rename a column
 
 pander::pander(head(tuition.raw[,1:6]))</code></pre>
@@ -507,13 +507,13 @@ pander::pander(head(tuition.raw[,1:6]))</code></pre>
   na.omit()
 
 pander::pander(head(tuition.clean))</code></pre>
-<table style="width:72%;">
+<table style="width:74%;">
 <colgroup>
 <col width="18%" />
 <col width="13%" />
 <col width="13%" />
 <col width="9%" />
-<col width="16%" />
+<col width="18%" />
 </colgroup>
 <thead>
 <tr class="header">
