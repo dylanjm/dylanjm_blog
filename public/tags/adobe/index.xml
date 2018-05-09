@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Tidytuesday on Uninformed Priors</title>
-    <link>/tags/tidytuesday/</link>
-    <description>Recent content in Tidytuesday on Uninformed Priors</description>
+    <title>Adobe on Uninformed Priors</title>
+    <link>/tags/adobe/</link>
+    <description>Recent content in Adobe on Uninformed Priors</description>
     <generator>Hugo -- gohugo.io</generator>
     <managingEditor>dylan.mcdowell226@gmail.com (Dylan McDowell)</managingEditor>
     <webMaster>dylan.mcdowell226@gmail.com (Dylan McDowell)</webMaster>
     <lastBuildDate>Wed, 02 May 2018 00:00:00 +0000</lastBuildDate>
     
-	<atom:link href="/tags/tidytuesday/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="/tags/adobe/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
@@ -20,16 +20,6 @@
       <guid>/posts/tidy-tuesday-week-02/</guid>
       <description>This post will walk us through the second week of #TidyTuesday. #TidyTuesday is a weekly social data project put on by the R for Data Science learning community. Every week a data set, article, and graphic are posted and users are encouraged to either recreate the graphic themselves using R or create their own take on the graphic using the data provided.
 This week, we’ll be using data from a fivethirtyeight article, “Running Backs are Finnaly Getting Paid what they are Worth”.</description>
-    </item>
-    
-    <item>
-      <title>Tidy Tuesday Week 01</title>
-      <link>/posts/tidy-tuesday-week-01/</link>
-      <pubDate>Mon, 16 Apr 2018 00:00:00 +0000</pubDate>
-      <author>dylan.mcdowell226@gmail.com (Dylan McDowell)</author>
-      <guid>/posts/tidy-tuesday-week-01/</guid>
-      <description>Here are some R libraries we will need to reproduce the plots for this week’s #TidyTuesday
-library(tidyverse) library(readxl) library(albersusa) library(ggthemes)  Background The online community, R for Data Science, has started what’s called #TidyTuesday. Every week they post a new dataset along with an original graphic and challenge people to either 1) recreate the plot or 2) create their own take on the data. For the very first challenge, they posted a data set on student tuition across the United States.</description>
     </item>
     
   </channel>

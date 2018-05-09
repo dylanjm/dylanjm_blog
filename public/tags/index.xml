@@ -7,10 +7,19 @@
     <generator>Hugo -- gohugo.io</generator>
     <managingEditor>dylan.mcdowell226@gmail.com (Dylan McDowell)</managingEditor>
     <webMaster>dylan.mcdowell226@gmail.com (Dylan McDowell)</webMaster>
-    <lastBuildDate>Fri, 20 Apr 2018 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Wed, 02 May 2018 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="/tags/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Adobe</title>
+      <link>/tags/adobe/</link>
+      <pubDate>Wed, 02 May 2018 00:00:00 +0000</pubDate>
+      <author>dylan.mcdowell226@gmail.com (Dylan McDowell)</author>
+      <guid>/tags/adobe/</guid>
+      <description></description>
+    </item>
     
     <item>
       <title>Economics</title>
@@ -18,6 +27,15 @@
       <pubDate>Fri, 20 Apr 2018 00:00:00 +0000</pubDate>
       <author>dylan.mcdowell226@gmail.com (Dylan McDowell)</author>
       <guid>/tags/economics/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Illustrator</title>
+      <link>/tags/illustrator/</link>
+      <pubDate>Wed, 02 May 2018 00:00:00 +0000</pubDate>
+      <author>dylan.mcdowell226@gmail.com (Dylan McDowell)</author>
+      <guid>/tags/illustrator/</guid>
       <description></description>
     </item>
     
@@ -42,7 +60,7 @@
     <item>
       <title>Tidytuesday</title>
       <link>/tags/tidytuesday/</link>
-      <pubDate>Mon, 16 Apr 2018 00:00:00 +0000</pubDate>
+      <pubDate>Wed, 02 May 2018 00:00:00 +0000</pubDate>
       <author>dylan.mcdowell226@gmail.com (Dylan McDowell)</author>
       <guid>/tags/tidytuesday/</guid>
       <description></description>
@@ -51,7 +69,7 @@
     <item>
       <title>Tidyverse</title>
       <link>/tags/tidyverse/</link>
-      <pubDate>Fri, 20 Apr 2018 00:00:00 +0000</pubDate>
+      <pubDate>Wed, 02 May 2018 00:00:00 +0000</pubDate>
       <author>dylan.mcdowell226@gmail.com (Dylan McDowell)</author>
       <guid>/tags/tidyverse/</guid>
       <description></description>

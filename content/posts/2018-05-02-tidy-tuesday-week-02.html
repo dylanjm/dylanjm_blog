@@ -1,0 +1,629 @@
+---
+title: "Tidy Tuesday Week 02"
+author: "Dylan McDowell"
+date: '2018-05-02'
+slug: tidy-tuesday-week-02
+categories:
+  - Posts
+tags:
+  - TidyTuesday
+  - tidyverse
+  - adobe
+  - illustrator
+---
+
+
+
+<p>This post will walk us through the second week of #TidyTuesday. <a href="https://github.com/rfordatascience/tidytuesday">#TidyTuesday</a> is a weekly social data project put on by the <a href="http://r4ds.had.co.nz/">R for Data Science</a> learning community. Every week a data set, article, and graphic are posted and users are encouraged to either recreate the graphic themselves using R or create their own take on the graphic using the data provided.</p>
+<p>This week, we’ll be using data from a fivethirtyeight article, <a href="https://fivethirtyeight.com/features/running-backs-are-finally-getting-paid-what-theyre-worth/">“Running Backs are Finnaly Getting Paid what they are Worth”</a>. In this blog post I am going to try to recreate the original graphics from scratch to the best of my ability. I’ll be using a mix of ggplot2 and adobe illustrator to create these graphics. If you are currently a student, it’s possible to get the entire adobe creative suite for only $20 a month. This is still a little expensive, but if you use it enough, it easily pays for itself.</p>
+<p><strong>Here are the original graphics:</strong></p>
+<div class="row">
+<div class="column">
+<p><img src="https://espnfivethirtyeight.files.wordpress.com/2017/05/morris-nflrb-1.png?w=500&h=488&quality=90&strip=info" alt="Fjords" style="width:100%; height:100%"></p>
+</div>
+<div class="column">
+<p><img src="https://espnfivethirtyeight.files.wordpress.com/2017/05/morris-nflrb-2.png?w=500&h=488&quality=90&strip=info" alt="Forest" style="width:100%; height:100%"></p>
+</div>
+</div>
+<p>Let’s get started! Here are a few libraries we’ll need to visualize these data! Also, let’s go ahead and read in our data set and view a small sample as well.</p>
+<pre class="r"><code>library(tidyverse)
+library(readxl)
+library(here)
+library(glue)
+library(ggrepel)
+library(huxtable)</code></pre>
+<pre class="r"><code>nfl.data &lt;- read_xlsx(here(&quot;data/tidy_tuesday_week2.xlsx&quot;))
+nfl.data[,1:6]                  %&gt;% 
+  head()                        %&gt;% 
+  hux(add_colnames = TRUE)      %&gt;% 
+  set_bold(1, 1:6, TRUE)        %&gt;% 
+  set_bottom_border(1, 1:6, 1)  %&gt;%
+  set_right_padding(10)         %&gt;%
+  set_left_padding(10)          %&gt;% 
+  set_caption(&#39;NFL Data&#39;)       %&gt;% 
+  set_number_format(NA) %&gt;% 
+  print_html()</code></pre>
+<table class="huxtable" style="border-collapse: collapse; width: 50%; margin-left: auto; margin-right: auto;">
+<caption style="caption-side:top; text-align:center">
+NFL Data
+</caption>
+<col style="width: NA;">
+<col style="width: NA;">
+<col style="width: NA;">
+<col style="width: NA;">
+<col style="width: NA;">
+<col style="width: NA;">
+<tr>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; border-width:0pt 0pt 1pt 0pt; border-style: solid; border-top-color: NA;  border-right-color: NA;  border-bottom-color: NA;  border-left-color: NA; padding: 4pt 10pt 4pt 10pt; ">
+<span style="font-weight: bold; ">year</span>
+</td>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; border-width:0pt 0pt 1pt 0pt; border-style: solid; border-top-color: NA;  border-right-color: NA;  border-bottom-color: NA;  border-left-color: NA; padding: 4pt 10pt 4pt 10pt; ">
+<span style="font-weight: bold; ">Cornerback</span>
+</td>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; border-width:0pt 0pt 1pt 0pt; border-style: solid; border-top-color: NA;  border-right-color: NA;  border-bottom-color: NA;  border-left-color: NA; padding: 4pt 10pt 4pt 10pt; ">
+<span style="font-weight: bold; ">Defensive Lineman</span>
+</td>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; border-width:0pt 0pt 1pt 0pt; border-style: solid; border-top-color: NA;  border-right-color: NA;  border-bottom-color: NA;  border-left-color: NA; padding: 4pt 10pt 4pt 10pt; ">
+<span style="font-weight: bold; ">Linebacker</span>
+</td>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; border-width:0pt 0pt 1pt 0pt; border-style: solid; border-top-color: NA;  border-right-color: NA;  border-bottom-color: NA;  border-left-color: NA; padding: 4pt 10pt 4pt 10pt; ">
+<span style="font-weight: bold; ">Offensive Lineman</span>
+</td>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; border-width:0pt 0pt 1pt 0pt; border-style: solid; border-top-color: NA;  border-right-color: NA;  border-bottom-color: NA;  border-left-color: NA; padding: 4pt 10pt 4pt 10pt; ">
+<span style="font-weight: bold; ">Quarterback</span>
+</td>
+</tr>
+<tr>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; border-width:0pt 0pt 0pt 0pt; border-style: solid; border-top-color: NA;  border-right-color: NA;  border-bottom-color: NA;  border-left-color: NA; padding: 4pt 10pt 4pt 10pt; ">
+2011
+</td>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; border-width:0pt 0pt 0pt 0pt; border-style: solid; border-top-color: NA;  border-right-color: NA;  border-bottom-color: NA;  border-left-color: NA; padding: 4pt 10pt 4pt 10pt; ">
+11265916
+</td>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; border-width:0pt 0pt 0pt 0pt; border-style: solid; border-top-color: NA;  border-right-color: NA;  border-bottom-color: NA;  border-left-color: NA; padding: 4pt 10pt 4pt 10pt; ">
+17818000
+</td>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; border-width:0pt 0pt 0pt 0pt; border-style: solid; border-top-color: NA;  border-right-color: NA;  border-bottom-color: NA;  border-left-color: NA; padding: 4pt 10pt 4pt 10pt; ">
+16420000
+</td>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; border-width:0pt 0pt 0pt 0pt; border-style: solid; border-top-color: NA;  border-right-color: NA;  border-bottom-color: NA;  border-left-color: NA; padding: 4pt 10pt 4pt 10pt; ">
+15960000
+</td>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; border-width:0pt 0pt 0pt 0pt; border-style: solid; border-top-color: NA;  border-right-color: NA;  border-bottom-color: NA;  border-left-color: NA; padding: 4pt 10pt 4pt 10pt; ">
+17228125
+</td>
+</tr>
+<tr>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; border-width:0pt 0pt 0pt 0pt; border-style: solid; border-top-color: NA;  border-right-color: NA;  border-bottom-color: NA;  border-left-color: NA; padding: 4pt 10pt 4pt 10pt; ">
+2011
+</td>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; border-width:0pt 0pt 0pt 0pt; border-style: solid; border-top-color: NA;  border-right-color: NA;  border-bottom-color: NA;  border-left-color: NA; padding: 4pt 10pt 4pt 10pt; ">
+1.1e+07
+</td>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; border-width:0pt 0pt 0pt 0pt; border-style: solid; border-top-color: NA;  border-right-color: NA;  border-bottom-color: NA;  border-left-color: NA; padding: 4pt 10pt 4pt 10pt; ">
+16200000
+</td>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; border-width:0pt 0pt 0pt 0pt; border-style: solid; border-top-color: NA;  border-right-color: NA;  border-bottom-color: NA;  border-left-color: NA; padding: 4pt 10pt 4pt 10pt; ">
+15623000
+</td>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; border-width:0pt 0pt 0pt 0pt; border-style: solid; border-top-color: NA;  border-right-color: NA;  border-bottom-color: NA;  border-left-color: NA; padding: 4pt 10pt 4pt 10pt; ">
+12800000
+</td>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; border-width:0pt 0pt 0pt 0pt; border-style: solid; border-top-color: NA;  border-right-color: NA;  border-bottom-color: NA;  border-left-color: NA; padding: 4pt 10pt 4pt 10pt; ">
+1.6e+07
+</td>
+</tr>
+<tr>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; border-width:0pt 0pt 0pt 0pt; border-style: solid; border-top-color: NA;  border-right-color: NA;  border-bottom-color: NA;  border-left-color: NA; padding: 4pt 10pt 4pt 10pt; ">
+2011
+</td>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; border-width:0pt 0pt 0pt 0pt; border-style: solid; border-top-color: NA;  border-right-color: NA;  border-bottom-color: NA;  border-left-color: NA; padding: 4pt 10pt 4pt 10pt; ">
+1e+07
+</td>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; border-width:0pt 0pt 0pt 0pt; border-style: solid; border-top-color: NA;  border-right-color: NA;  border-bottom-color: NA;  border-left-color: NA; padding: 4pt 10pt 4pt 10pt; ">
+12476000
+</td>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; border-width:0pt 0pt 0pt 0pt; border-style: solid; border-top-color: NA;  border-right-color: NA;  border-bottom-color: NA;  border-left-color: NA; padding: 4pt 10pt 4pt 10pt; ">
+11825000
+</td>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; border-width:0pt 0pt 0pt 0pt; border-style: solid; border-top-color: NA;  border-right-color: NA;  border-bottom-color: NA;  border-left-color: NA; padding: 4pt 10pt 4pt 10pt; ">
+11767500
+</td>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; border-width:0pt 0pt 0pt 0pt; border-style: solid; border-top-color: NA;  border-right-color: NA;  border-bottom-color: NA;  border-left-color: NA; padding: 4pt 10pt 4pt 10pt; ">
+14400000
+</td>
+</tr>
+<tr>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; border-width:0pt 0pt 0pt 0pt; border-style: solid; border-top-color: NA;  border-right-color: NA;  border-bottom-color: NA;  border-left-color: NA; padding: 4pt 10pt 4pt 10pt; ">
+2011
+</td>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; border-width:0pt 0pt 0pt 0pt; border-style: solid; border-top-color: NA;  border-right-color: NA;  border-bottom-color: NA;  border-left-color: NA; padding: 4pt 10pt 4pt 10pt; ">
+1e+07
+</td>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; border-width:0pt 0pt 0pt 0pt; border-style: solid; border-top-color: NA;  border-right-color: NA;  border-bottom-color: NA;  border-left-color: NA; padding: 4pt 10pt 4pt 10pt; ">
+11904706
+</td>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; border-width:0pt 0pt 0pt 0pt; border-style: solid; border-top-color: NA;  border-right-color: NA;  border-bottom-color: NA;  border-left-color: NA; padding: 4pt 10pt 4pt 10pt; ">
+10083333
+</td>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; border-width:0pt 0pt 0pt 0pt; border-style: solid; border-top-color: NA;  border-right-color: NA;  border-bottom-color: NA;  border-left-color: NA; padding: 4pt 10pt 4pt 10pt; ">
+10358200
+</td>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; border-width:0pt 0pt 0pt 0pt; border-style: solid; border-top-color: NA;  border-right-color: NA;  border-bottom-color: NA;  border-left-color: NA; padding: 4pt 10pt 4pt 10pt; ">
+14100000
+</td>
+</tr>
+<tr>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; border-width:0pt 0pt 0pt 0pt; border-style: solid; border-top-color: NA;  border-right-color: NA;  border-bottom-color: NA;  border-left-color: NA; padding: 4pt 10pt 4pt 10pt; ">
+2011
+</td>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; border-width:0pt 0pt 0pt 0pt; border-style: solid; border-top-color: NA;  border-right-color: NA;  border-bottom-color: NA;  border-left-color: NA; padding: 4pt 10pt 4pt 10pt; ">
+1e+07
+</td>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; border-width:0pt 0pt 0pt 0pt; border-style: solid; border-top-color: NA;  border-right-color: NA;  border-bottom-color: NA;  border-left-color: NA; padding: 4pt 10pt 4pt 10pt; ">
+11762782
+</td>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; border-width:0pt 0pt 0pt 0pt; border-style: solid; border-top-color: NA;  border-right-color: NA;  border-bottom-color: NA;  border-left-color: NA; padding: 4pt 10pt 4pt 10pt; ">
+10020000
+</td>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; border-width:0pt 0pt 0pt 0pt; border-style: solid; border-top-color: NA;  border-right-color: NA;  border-bottom-color: NA;  border-left-color: NA; padding: 4pt 10pt 4pt 10pt; ">
+1e+07
+</td>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; border-width:0pt 0pt 0pt 0pt; border-style: solid; border-top-color: NA;  border-right-color: NA;  border-bottom-color: NA;  border-left-color: NA; padding: 4pt 10pt 4pt 10pt; ">
+13510000
+</td>
+</tr>
+<tr>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; border-width:0pt 0pt 0pt 0pt; border-style: solid; border-top-color: NA;  border-right-color: NA;  border-bottom-color: NA;  border-left-color: NA; padding: 4pt 10pt 4pt 10pt; ">
+2011
+</td>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; border-width:0pt 0pt 0pt 0pt; border-style: solid; border-top-color: NA;  border-right-color: NA;  border-bottom-color: NA;  border-left-color: NA; padding: 4pt 10pt 4pt 10pt; ">
+9244117
+</td>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; border-width:0pt 0pt 0pt 0pt; border-style: solid; border-top-color: NA;  border-right-color: NA;  border-bottom-color: NA;  border-left-color: NA; padding: 4pt 10pt 4pt 10pt; ">
+11340000
+</td>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; border-width:0pt 0pt 0pt 0pt; border-style: solid; border-top-color: NA;  border-right-color: NA;  border-bottom-color: NA;  border-left-color: NA; padding: 4pt 10pt 4pt 10pt; ">
+8150000
+</td>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; border-width:0pt 0pt 0pt 0pt; border-style: solid; border-top-color: NA;  border-right-color: NA;  border-bottom-color: NA;  border-left-color: NA; padding: 4pt 10pt 4pt 10pt; ">
+9859166
+</td>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; border-width:0pt 0pt 0pt 0pt; border-style: solid; border-top-color: NA;  border-right-color: NA;  border-bottom-color: NA;  border-left-color: NA; padding: 4pt 10pt 4pt 10pt; ">
+13250000
+</td>
+</tr>
+</table>
+<p>By looking at the data, my mind is already thinking that we are going to have to <code>gather()</code> these data in order to plot it effectively. We are also going to need to create the abbreviations of the positions from scratch, and develop the order we are going to want to order our facets later in the plotting. To do this, we’ll create a <code>tribble</code>, which is essentially a row-wise created table that is visually easier to interpret when looking at the code. Notice how a tribble is created differently than other tibbles or data.frames. This is merely syntactic sugar and doesn’t provide much in terms of functionality besides ease of readability. For more information on tribbles, run <code>?tribble</code>.</p>
+<pre class="r"><code># Inspiration from #rstats users elsherbini to use a tribble here
+# Now we can get the abbreviations easily
+# This will also double as our fct_relevel for later
+# abb is an abreviation for abbreviation!
+shorthand &lt;- tribble(
+  ~position, ~abb,
+  &quot;Running Back&quot;, &quot;RB&quot;,
+  &quot;Quarterback&quot;, &quot;QB&quot;,
+  &quot;Offensive Lineman&quot;, &quot;OL&quot;,
+  &quot;Tight End&quot;, &quot;TE&quot;,
+  &quot;Wide Receiver&quot;, &quot;WR&quot;,
+  &quot;Cornerback&quot;, &quot;CB&quot;,
+  &quot;Defensive Lineman&quot;, &quot;DE&quot;,
+  &quot;Linebacker&quot;, &quot;LB&quot;,
+  &quot;Safety&quot;, &quot;S&quot;,
+  &quot;Special Teamer&quot;, &quot;ST&quot;
+)</code></pre>
+<p>Next, we’ll want to create the data sets we’ll use to plot. Like I mentioned before, we are going to want to gather the data set into long form. For those who may not be aware, we are doing this because typically is best practice to have a data set where each row is only <strong>one</strong> observation. In the original data set, each row had an observation for Quarterback, Running Back, Safety, etc…For more information on this topic <a href="https://cran.r-project.org/web/packages/tidyr/vignettes/tidy-data.html">read this vignette</a>.</p>
+<p>After gathering the data, we are going to add in the tribble we created up above so we have our abbreviations at the ready. Next, we are going to edit and create a few different columns. Here is a quick outline:</p>
+<ol style="list-style-type: decimal">
+<li>Change the order of our position factors so they facet in the correct order.</li>
+<li>Do the same as above but in the case for the abbreviations.</li>
+<li>Scale the pay down so it is read in terms of millions $.</li>
+<li>We want to only grab the last two digits of our year, so we’ll use modulus division to get those numbers.</li>
+<li>We also want to be able to split the positions up into defense/offense. We’ll take care of that with a <code>case_when()</code> statement.</li>
+</ol>
+<p>Following those changes, we’ll want to group by year and position so we can get the top 16 paid athletes for each year and position. I have to grin every time I use the <code>top_n()</code> function, it’s just smooth as butter 🥞🥞🥞!</p>
+<pre class="r"><code># Let&#39;s get our data down to the Top 16 Athletes Long Format
+top.paid &lt;- nfl.data %&gt;%
+  gather(key = &quot;position&quot;, value = &quot;pay&quot;, Cornerback:`Wide Receiver`) %&gt;%
+  left_join(shorthand, by = &quot;position&quot;) %&gt;% 
+  mutate(position = fct_relevel(position, shorthand$position),
+         abb = fct_relevel(abb, shorthand$abb),
+         pay = pay/1e6, 
+         year = year %% 100,
+         type = factor(case_when(
+           abb %in% c(&quot;RB&quot;, &quot;QB&quot;, &quot;OL&quot;, &quot;TE&quot;, &quot;WR&quot;) ~ &quot;Offense&quot;,
+           TRUE ~ &quot;Defense&quot;
+         ), level = c(&quot;Offense&quot;, &quot;Defense&quot;))) %&gt;% 
+  group_by(year, position) %&gt;% 
+  top_n(16, wt = pay) %&gt;% 
+  na.omit %&gt;% 
+  ungroup()</code></pre>
+<table class="huxtable" style="border-collapse: collapse; width: 50%; margin-left: auto; margin-right: auto;">
+<caption style="caption-side:top; text-align:center">
+Long NFL Data (Pay in Millions)
+</caption>
+<col style="width: NA;">
+<col style="width: NA;">
+<col style="width: NA;">
+<col style="width: NA;">
+<col style="width: NA;">
+<tr>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; border-width:0pt 0pt 1pt 0pt; border-style: solid; border-top-color: NA;  border-right-color: NA;  border-bottom-color: NA;  border-left-color: NA; padding: 4pt 10pt 4pt 10pt; ">
+<span style="font-weight: bold; ">year</span>
+</td>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; border-width:0pt 0pt 1pt 0pt; border-style: solid; border-top-color: NA;  border-right-color: NA;  border-bottom-color: NA;  border-left-color: NA; padding: 4pt 10pt 4pt 10pt; ">
+<span style="font-weight: bold; ">position</span>
+</td>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; border-width:0pt 0pt 1pt 0pt; border-style: solid; border-top-color: NA;  border-right-color: NA;  border-bottom-color: NA;  border-left-color: NA; padding: 4pt 10pt 4pt 10pt; ">
+<span style="font-weight: bold; ">pay</span>
+</td>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; border-width:0pt 0pt 1pt 0pt; border-style: solid; border-top-color: NA;  border-right-color: NA;  border-bottom-color: NA;  border-left-color: NA; padding: 4pt 10pt 4pt 10pt; ">
+<span style="font-weight: bold; ">abb</span>
+</td>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; border-width:0pt 0pt 1pt 0pt; border-style: solid; border-top-color: NA;  border-right-color: NA;  border-bottom-color: NA;  border-left-color: NA; padding: 4pt 10pt 4pt 10pt; ">
+<span style="font-weight: bold; ">type</span>
+</td>
+</tr>
+<tr>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; border-width:0pt 0pt 0pt 0pt; border-style: solid; border-top-color: NA;  border-right-color: NA;  border-bottom-color: NA;  border-left-color: NA; padding: 4pt 10pt 4pt 10pt; ">
+11.00
+</td>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; border-width:0pt 0pt 0pt 0pt; border-style: solid; border-top-color: NA;  border-right-color: NA;  border-bottom-color: NA;  border-left-color: NA; padding: 4pt 10pt 4pt 10pt; ">
+Cornerback
+</td>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; border-width:0pt 0pt 0pt 0pt; border-style: solid; border-top-color: NA;  border-right-color: NA;  border-bottom-color: NA;  border-left-color: NA; padding: 4pt 10pt 4pt 10pt; ">
+11.27
+</td>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; border-width:0pt 0pt 0pt 0pt; border-style: solid; border-top-color: NA;  border-right-color: NA;  border-bottom-color: NA;  border-left-color: NA; padding: 4pt 10pt 4pt 10pt; ">
+CB
+</td>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; border-width:0pt 0pt 0pt 0pt; border-style: solid; border-top-color: NA;  border-right-color: NA;  border-bottom-color: NA;  border-left-color: NA; padding: 4pt 10pt 4pt 10pt; ">
+Defense
+</td>
+</tr>
+<tr>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; border-width:0pt 0pt 0pt 0pt; border-style: solid; border-top-color: NA;  border-right-color: NA;  border-bottom-color: NA;  border-left-color: NA; padding: 4pt 10pt 4pt 10pt; ">
+11.00
+</td>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; border-width:0pt 0pt 0pt 0pt; border-style: solid; border-top-color: NA;  border-right-color: NA;  border-bottom-color: NA;  border-left-color: NA; padding: 4pt 10pt 4pt 10pt; ">
+Cornerback
+</td>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; border-width:0pt 0pt 0pt 0pt; border-style: solid; border-top-color: NA;  border-right-color: NA;  border-bottom-color: NA;  border-left-color: NA; padding: 4pt 10pt 4pt 10pt; ">
+11.00
+</td>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; border-width:0pt 0pt 0pt 0pt; border-style: solid; border-top-color: NA;  border-right-color: NA;  border-bottom-color: NA;  border-left-color: NA; padding: 4pt 10pt 4pt 10pt; ">
+CB
+</td>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; border-width:0pt 0pt 0pt 0pt; border-style: solid; border-top-color: NA;  border-right-color: NA;  border-bottom-color: NA;  border-left-color: NA; padding: 4pt 10pt 4pt 10pt; ">
+Defense
+</td>
+</tr>
+<tr>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; border-width:0pt 0pt 0pt 0pt; border-style: solid; border-top-color: NA;  border-right-color: NA;  border-bottom-color: NA;  border-left-color: NA; padding: 4pt 10pt 4pt 10pt; ">
+11.00
+</td>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; border-width:0pt 0pt 0pt 0pt; border-style: solid; border-top-color: NA;  border-right-color: NA;  border-bottom-color: NA;  border-left-color: NA; padding: 4pt 10pt 4pt 10pt; ">
+Cornerback
+</td>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; border-width:0pt 0pt 0pt 0pt; border-style: solid; border-top-color: NA;  border-right-color: NA;  border-bottom-color: NA;  border-left-color: NA; padding: 4pt 10pt 4pt 10pt; ">
+10.00
+</td>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; border-width:0pt 0pt 0pt 0pt; border-style: solid; border-top-color: NA;  border-right-color: NA;  border-bottom-color: NA;  border-left-color: NA; padding: 4pt 10pt 4pt 10pt; ">
+CB
+</td>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; border-width:0pt 0pt 0pt 0pt; border-style: solid; border-top-color: NA;  border-right-color: NA;  border-bottom-color: NA;  border-left-color: NA; padding: 4pt 10pt 4pt 10pt; ">
+Defense
+</td>
+</tr>
+<tr>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; border-width:0pt 0pt 0pt 0pt; border-style: solid; border-top-color: NA;  border-right-color: NA;  border-bottom-color: NA;  border-left-color: NA; padding: 4pt 10pt 4pt 10pt; ">
+11.00
+</td>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; border-width:0pt 0pt 0pt 0pt; border-style: solid; border-top-color: NA;  border-right-color: NA;  border-bottom-color: NA;  border-left-color: NA; padding: 4pt 10pt 4pt 10pt; ">
+Cornerback
+</td>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; border-width:0pt 0pt 0pt 0pt; border-style: solid; border-top-color: NA;  border-right-color: NA;  border-bottom-color: NA;  border-left-color: NA; padding: 4pt 10pt 4pt 10pt; ">
+10.00
+</td>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; border-width:0pt 0pt 0pt 0pt; border-style: solid; border-top-color: NA;  border-right-color: NA;  border-bottom-color: NA;  border-left-color: NA; padding: 4pt 10pt 4pt 10pt; ">
+CB
+</td>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; border-width:0pt 0pt 0pt 0pt; border-style: solid; border-top-color: NA;  border-right-color: NA;  border-bottom-color: NA;  border-left-color: NA; padding: 4pt 10pt 4pt 10pt; ">
+Defense
+</td>
+</tr>
+<tr>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; border-width:0pt 0pt 0pt 0pt; border-style: solid; border-top-color: NA;  border-right-color: NA;  border-bottom-color: NA;  border-left-color: NA; padding: 4pt 10pt 4pt 10pt; ">
+11.00
+</td>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; border-width:0pt 0pt 0pt 0pt; border-style: solid; border-top-color: NA;  border-right-color: NA;  border-bottom-color: NA;  border-left-color: NA; padding: 4pt 10pt 4pt 10pt; ">
+Cornerback
+</td>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; border-width:0pt 0pt 0pt 0pt; border-style: solid; border-top-color: NA;  border-right-color: NA;  border-bottom-color: NA;  border-left-color: NA; padding: 4pt 10pt 4pt 10pt; ">
+10.00
+</td>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; border-width:0pt 0pt 0pt 0pt; border-style: solid; border-top-color: NA;  border-right-color: NA;  border-bottom-color: NA;  border-left-color: NA; padding: 4pt 10pt 4pt 10pt; ">
+CB
+</td>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; border-width:0pt 0pt 0pt 0pt; border-style: solid; border-top-color: NA;  border-right-color: NA;  border-bottom-color: NA;  border-left-color: NA; padding: 4pt 10pt 4pt 10pt; ">
+Defense
+</td>
+</tr>
+<tr>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; border-width:0pt 0pt 0pt 0pt; border-style: solid; border-top-color: NA;  border-right-color: NA;  border-bottom-color: NA;  border-left-color: NA; padding: 4pt 10pt 4pt 10pt; ">
+11.00
+</td>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; border-width:0pt 0pt 0pt 0pt; border-style: solid; border-top-color: NA;  border-right-color: NA;  border-bottom-color: NA;  border-left-color: NA; padding: 4pt 10pt 4pt 10pt; ">
+Cornerback
+</td>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; border-width:0pt 0pt 0pt 0pt; border-style: solid; border-top-color: NA;  border-right-color: NA;  border-bottom-color: NA;  border-left-color: NA; padding: 4pt 10pt 4pt 10pt; ">
+9.24
+</td>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; border-width:0pt 0pt 0pt 0pt; border-style: solid; border-top-color: NA;  border-right-color: NA;  border-bottom-color: NA;  border-left-color: NA; padding: 4pt 10pt 4pt 10pt; ">
+CB
+</td>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; border-width:0pt 0pt 0pt 0pt; border-style: solid; border-top-color: NA;  border-right-color: NA;  border-bottom-color: NA;  border-left-color: NA; padding: 4pt 10pt 4pt 10pt; ">
+Defense
+</td>
+</tr>
+</table>
+<p>Much better! For the next data set, we’ll get rid of the “Special Teamer” position since it is not in the second plot. Next we’ll have to do some hacky summarising to get exactly what we want. We want to get the percent of money spent on each position for each year. This means we’ll need the total amount spent for each year and then use that as the denominator and group by again but only then creating a <code>percent.paid</code> column.</p>
+<pre class="r"><code># Let&#39;s continue to clean our data to get the proportions
+# spent on athletes
+position.percent &lt;- top.paid %&gt;% 
+  filter(!position %in% c(&quot;Special Teamer&quot;)) %&gt;% 
+  group_by(year, position, abb, type) %&gt;% 
+  summarise(total.paid = sum(pay)) %&gt;% 
+  group_by(year) %&gt;% 
+  mutate(percent.paid = total.paid/sum(total.paid)) %&gt;% 
+  ungroup()</code></pre>
+<table class="huxtable" style="border-collapse: collapse; width: 50%; margin-left: auto; margin-right: auto;">
+<caption style="caption-side:top; text-align:center">
+Percent Paid across Positions Data (Pay in Millions)
+</caption>
+<col style="width: NA;">
+<col style="width: NA;">
+<col style="width: NA;">
+<col style="width: NA;">
+<col style="width: NA;">
+<col style="width: NA;">
+<tr>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; border-width:0pt 0pt 1pt 0pt; border-style: solid; border-top-color: NA;  border-right-color: NA;  border-bottom-color: NA;  border-left-color: NA; padding: 4pt 10pt 4pt 10pt; ">
+<span style="font-weight: bold; ">year</span>
+</td>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; border-width:0pt 0pt 1pt 0pt; border-style: solid; border-top-color: NA;  border-right-color: NA;  border-bottom-color: NA;  border-left-color: NA; padding: 4pt 10pt 4pt 10pt; ">
+<span style="font-weight: bold; ">position</span>
+</td>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; border-width:0pt 0pt 1pt 0pt; border-style: solid; border-top-color: NA;  border-right-color: NA;  border-bottom-color: NA;  border-left-color: NA; padding: 4pt 10pt 4pt 10pt; ">
+<span style="font-weight: bold; ">abb</span>
+</td>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; border-width:0pt 0pt 1pt 0pt; border-style: solid; border-top-color: NA;  border-right-color: NA;  border-bottom-color: NA;  border-left-color: NA; padding: 4pt 10pt 4pt 10pt; ">
+<span style="font-weight: bold; ">type</span>
+</td>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; border-width:0pt 0pt 1pt 0pt; border-style: solid; border-top-color: NA;  border-right-color: NA;  border-bottom-color: NA;  border-left-color: NA; padding: 4pt 10pt 4pt 10pt; ">
+<span style="font-weight: bold; ">total.paid</span>
+</td>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; border-width:0pt 0pt 1pt 0pt; border-style: solid; border-top-color: NA;  border-right-color: NA;  border-bottom-color: NA;  border-left-color: NA; padding: 4pt 10pt 4pt 10pt; ">
+<span style="font-weight: bold; ">percent.paid</span>
+</td>
+</tr>
+<tr>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; border-width:0pt 0pt 0pt 0pt; border-style: solid; border-top-color: NA;  border-right-color: NA;  border-bottom-color: NA;  border-left-color: NA; padding: 4pt 10pt 4pt 10pt; ">
+11.00
+</td>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; border-width:0pt 0pt 0pt 0pt; border-style: solid; border-top-color: NA;  border-right-color: NA;  border-bottom-color: NA;  border-left-color: NA; padding: 4pt 10pt 4pt 10pt; ">
+Running Back
+</td>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; border-width:0pt 0pt 0pt 0pt; border-style: solid; border-top-color: NA;  border-right-color: NA;  border-bottom-color: NA;  border-left-color: NA; padding: 4pt 10pt 4pt 10pt; ">
+RB
+</td>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; border-width:0pt 0pt 0pt 0pt; border-style: solid; border-top-color: NA;  border-right-color: NA;  border-bottom-color: NA;  border-left-color: NA; padding: 4pt 10pt 4pt 10pt; ">
+Offense
+</td>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; border-width:0pt 0pt 0pt 0pt; border-style: solid; border-top-color: NA;  border-right-color: NA;  border-bottom-color: NA;  border-left-color: NA; padding: 4pt 10pt 4pt 10pt; ">
+103.57
+</td>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; border-width:0pt 0pt 0pt 0pt; border-style: solid; border-top-color: NA;  border-right-color: NA;  border-bottom-color: NA;  border-left-color: NA; padding: 4pt 10pt 4pt 10pt; ">
+0.09
+</td>
+</tr>
+<tr>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; border-width:0pt 0pt 0pt 0pt; border-style: solid; border-top-color: NA;  border-right-color: NA;  border-bottom-color: NA;  border-left-color: NA; padding: 4pt 10pt 4pt 10pt; ">
+11.00
+</td>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; border-width:0pt 0pt 0pt 0pt; border-style: solid; border-top-color: NA;  border-right-color: NA;  border-bottom-color: NA;  border-left-color: NA; padding: 4pt 10pt 4pt 10pt; ">
+Quarterback
+</td>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; border-width:0pt 0pt 0pt 0pt; border-style: solid; border-top-color: NA;  border-right-color: NA;  border-bottom-color: NA;  border-left-color: NA; padding: 4pt 10pt 4pt 10pt; ">
+QB
+</td>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; border-width:0pt 0pt 0pt 0pt; border-style: solid; border-top-color: NA;  border-right-color: NA;  border-bottom-color: NA;  border-left-color: NA; padding: 4pt 10pt 4pt 10pt; ">
+Offense
+</td>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; border-width:0pt 0pt 0pt 0pt; border-style: solid; border-top-color: NA;  border-right-color: NA;  border-bottom-color: NA;  border-left-color: NA; padding: 4pt 10pt 4pt 10pt; ">
+186.41
+</td>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; border-width:0pt 0pt 0pt 0pt; border-style: solid; border-top-color: NA;  border-right-color: NA;  border-bottom-color: NA;  border-left-color: NA; padding: 4pt 10pt 4pt 10pt; ">
+0.16
+</td>
+</tr>
+<tr>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; border-width:0pt 0pt 0pt 0pt; border-style: solid; border-top-color: NA;  border-right-color: NA;  border-bottom-color: NA;  border-left-color: NA; padding: 4pt 10pt 4pt 10pt; ">
+11.00
+</td>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; border-width:0pt 0pt 0pt 0pt; border-style: solid; border-top-color: NA;  border-right-color: NA;  border-bottom-color: NA;  border-left-color: NA; padding: 4pt 10pt 4pt 10pt; ">
+Offensive Lineman
+</td>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; border-width:0pt 0pt 0pt 0pt; border-style: solid; border-top-color: NA;  border-right-color: NA;  border-bottom-color: NA;  border-left-color: NA; padding: 4pt 10pt 4pt 10pt; ">
+OL
+</td>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; border-width:0pt 0pt 0pt 0pt; border-style: solid; border-top-color: NA;  border-right-color: NA;  border-bottom-color: NA;  border-left-color: NA; padding: 4pt 10pt 4pt 10pt; ">
+Offense
+</td>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; border-width:0pt 0pt 0pt 0pt; border-style: solid; border-top-color: NA;  border-right-color: NA;  border-bottom-color: NA;  border-left-color: NA; padding: 4pt 10pt 4pt 10pt; ">
+154.89
+</td>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; border-width:0pt 0pt 0pt 0pt; border-style: solid; border-top-color: NA;  border-right-color: NA;  border-bottom-color: NA;  border-left-color: NA; padding: 4pt 10pt 4pt 10pt; ">
+0.13
+</td>
+</tr>
+<tr>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; border-width:0pt 0pt 0pt 0pt; border-style: solid; border-top-color: NA;  border-right-color: NA;  border-bottom-color: NA;  border-left-color: NA; padding: 4pt 10pt 4pt 10pt; ">
+11.00
+</td>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; border-width:0pt 0pt 0pt 0pt; border-style: solid; border-top-color: NA;  border-right-color: NA;  border-bottom-color: NA;  border-left-color: NA; padding: 4pt 10pt 4pt 10pt; ">
+Tight End
+</td>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; border-width:0pt 0pt 0pt 0pt; border-style: solid; border-top-color: NA;  border-right-color: NA;  border-bottom-color: NA;  border-left-color: NA; padding: 4pt 10pt 4pt 10pt; ">
+TE
+</td>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; border-width:0pt 0pt 0pt 0pt; border-style: solid; border-top-color: NA;  border-right-color: NA;  border-bottom-color: NA;  border-left-color: NA; padding: 4pt 10pt 4pt 10pt; ">
+Offense
+</td>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; border-width:0pt 0pt 0pt 0pt; border-style: solid; border-top-color: NA;  border-right-color: NA;  border-bottom-color: NA;  border-left-color: NA; padding: 4pt 10pt 4pt 10pt; ">
+87.07
+</td>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; border-width:0pt 0pt 0pt 0pt; border-style: solid; border-top-color: NA;  border-right-color: NA;  border-bottom-color: NA;  border-left-color: NA; padding: 4pt 10pt 4pt 10pt; ">
+0.07
+</td>
+</tr>
+<tr>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; border-width:0pt 0pt 0pt 0pt; border-style: solid; border-top-color: NA;  border-right-color: NA;  border-bottom-color: NA;  border-left-color: NA; padding: 4pt 10pt 4pt 10pt; ">
+11.00
+</td>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; border-width:0pt 0pt 0pt 0pt; border-style: solid; border-top-color: NA;  border-right-color: NA;  border-bottom-color: NA;  border-left-color: NA; padding: 4pt 10pt 4pt 10pt; ">
+Wide Receiver
+</td>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; border-width:0pt 0pt 0pt 0pt; border-style: solid; border-top-color: NA;  border-right-color: NA;  border-bottom-color: NA;  border-left-color: NA; padding: 4pt 10pt 4pt 10pt; ">
+WR
+</td>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; border-width:0pt 0pt 0pt 0pt; border-style: solid; border-top-color: NA;  border-right-color: NA;  border-bottom-color: NA;  border-left-color: NA; padding: 4pt 10pt 4pt 10pt; ">
+Offense
+</td>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; border-width:0pt 0pt 0pt 0pt; border-style: solid; border-top-color: NA;  border-right-color: NA;  border-bottom-color: NA;  border-left-color: NA; padding: 4pt 10pt 4pt 10pt; ">
+138.94
+</td>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; border-width:0pt 0pt 0pt 0pt; border-style: solid; border-top-color: NA;  border-right-color: NA;  border-bottom-color: NA;  border-left-color: NA; padding: 4pt 10pt 4pt 10pt; ">
+0.12
+</td>
+</tr>
+<tr>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; border-width:0pt 0pt 0pt 0pt; border-style: solid; border-top-color: NA;  border-right-color: NA;  border-bottom-color: NA;  border-left-color: NA; padding: 4pt 10pt 4pt 10pt; ">
+11.00
+</td>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; border-width:0pt 0pt 0pt 0pt; border-style: solid; border-top-color: NA;  border-right-color: NA;  border-bottom-color: NA;  border-left-color: NA; padding: 4pt 10pt 4pt 10pt; ">
+Cornerback
+</td>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; border-width:0pt 0pt 0pt 0pt; border-style: solid; border-top-color: NA;  border-right-color: NA;  border-bottom-color: NA;  border-left-color: NA; padding: 4pt 10pt 4pt 10pt; ">
+CB
+</td>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; border-width:0pt 0pt 0pt 0pt; border-style: solid; border-top-color: NA;  border-right-color: NA;  border-bottom-color: NA;  border-left-color: NA; padding: 4pt 10pt 4pt 10pt; ">
+Defense
+</td>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; border-width:0pt 0pt 0pt 0pt; border-style: solid; border-top-color: NA;  border-right-color: NA;  border-bottom-color: NA;  border-left-color: NA; padding: 4pt 10pt 4pt 10pt; ">
+129.86
+</td>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; border-width:0pt 0pt 0pt 0pt; border-style: solid; border-top-color: NA;  border-right-color: NA;  border-bottom-color: NA;  border-left-color: NA; padding: 4pt 10pt 4pt 10pt; ">
+0.11
+</td>
+</tr>
+</table>
+<p>Perfect! Now since my goal was to make these plots from scratch I am going to create my own fivethirtyeight theme. I could use <code>theme_fivethirtyeight()</code> that comes in <code>library(ggthemes)</code>, which is a greate boiler-plate theme to creating nice looking plots. But I want to get better at understanding the dynamics of making custom plots so we’ll go ahead and roll our own. Also, I went ahead and created a custom color pallete with the colors from the second plot. I ended up having to use an eye dropper from <a href="https://www.w3schools.com/colors/colors_picker.asp">w3 School’s Online Html Color Picker</a>. If you know a better way to get color codes, please let me know, as it was a painstaking process!</p>
+<pre class="r"><code>wannabe_538 &lt;- theme(plot.background = element_rect(color = &quot;#e6e6e6&quot;), 
+                     panel.grid.minor = element_blank(),
+                     plot.title = element_text(face = &quot;bold&quot;, size = rel(2)),
+                     plot.subtitle = element_text(size = rel(1.2)),
+                     plot.caption = element_text(face = &quot;italic&quot;),
+                     panel.background = element_blank(),
+                     axis.ticks = element_blank(),
+                     panel.grid.major = element_line(color = &quot;#b6b6b6&quot;),
+                     strip.background = element_blank(),
+                     strip.text = element_text(face = &quot;bold&quot;, size = rel(1.3)),
+                     axis.title = element_text(face = &quot;bold&quot;, size = rel(1.2)),
+                     axis.title.x = element_blank())
+
+# Color pallete for the lines, I ended up switching a few colors 
+# in Adobe Illustrator
+col_pal &lt;- c(&quot;#222222&quot;, &quot;#8e76ac&quot;,
+             &quot;#f9d75a&quot;, &quot;#d47bad&quot;,
+             &quot;#56ad74&quot;, &quot;#8aaef6&quot;, &quot;#b6b83c&quot;, 
+             &quot;#dd575a&quot;, &quot;#aa7f77&quot;, &quot;#6e6e6e&quot;)
+names(col_pal) &lt;- levels(position.percent$position)</code></pre>
+<p>Okay, now that I have my theme created and all my data cleaned it’s time to start plotting. How I’m going to approach creating these plots is that I will go as far as ggplot will possibly take me, and then transition into using Adobe Illustrator to finish up the job. The primary goal is that I use Illustrator as minimal as possible. If at anytime you see something, that I could’ve done in R, please let me know!</p>
+<pre class="r"><code># We&#39;ll need this small dataframe to create the Trend Label and Line
+# This will make adding the segment to the plot easier
+trend_arrow &lt;- tibble(year = 12.5, position = factor(&quot;Runningback&quot;), pay = 15,
+                      abb = factor(&quot;RB&quot;), type = factor(&quot;Offense&quot;))
+
+# First Plot
+ggplot(top.paid, aes(x = year, y = pay, group = position)) +
+  geom_point(alpha = .3, size = 2) +
+  geom_smooth(color = &quot;orangered&quot;, size = .9, se = FALSE) +
+  geom_smooth(data = filter(top.paid, abb == &quot;RB&quot;), color = &quot;black&quot;, se = FALSE) + 
+  scale_y_continuous(expand = c(0,0),
+                     limits = c(-1.5, 26.5), 
+                     labels = c(&quot;0&quot;, &quot;5&quot;, &quot;10&quot;, &quot;15&quot;, &quot;20&quot;, &quot;$25m&quot;)) +
+  scale_x_continuous(labels = scales::dollar_format(prefix = &quot;&#39;&quot;)) +
+  geom_label(aes(x = 12, y = 22.7, label = abb), 
+             fill = &quot;white&quot;, label.size = 0, label.padding = unit(0.15, &quot;lines&quot;)) +
+  geom_label(data = trend_arrow, aes(x = year, y = pay, label = &quot;Trend&quot;),
+             fill = &quot;white&quot;, label.size = 0) +
+  geom_segment(data = trend_arrow, aes(x = 12.5, xend = 12.5, y = 14, yend = 8)) +
+  facet_wrap(~ type + abb, ncol = 5) +
+  annotate(&quot;segment&quot;, y = 0, yend = 0, x = -Inf, xend = Inf, color = &quot;#4d4d4d&quot;, 
+           size = .9) + 
+  labs(title = &quot;The average pay for top running backs has stalled&quot;, 
+       subtitle = &quot;Average cap value of 16 highest-paid players in each position&quot;,
+       x = &quot;Year&quot;, 
+       y = &quot;Average Cap Value&quot;, 
+       caption = &quot;Graphic: @dylanjm_ds | Data: spotrac.com&quot;) +
+  wannabe_538 +
+  theme(axis.text = element_text(hjust = .8),
+        axis.text.y = element_text(size = rel(1.2), margin = margin(r = -2.8))
+        )</code></pre>
+<p><img src="/posts/2018-05-02-tidy-tuesday-week-02_files/figure-html/unnamed-chunk-9-1.png" width="960" style="display: block; margin: auto;" /></p>
+<p>Okay, so now at this poing I’m going to take this graphic into Illustrator and make some small adjustments. After exporting this graphic into a <strong>.PDF</strong> file, I opened it in Illustrator and released the clipping mask so I can edit each part individually.</p>
+<p><img src="../../img/adobe_tidy_02.png" /></p>
+<p>Now, I’ll just make a few small adjustments to the titles, font, and size of the graphic… and WALLAH!</p>
+<center>
+<img src="../../img/tidy02-01.png">
+</center>
+<p>As you can see, I have only made minor adjustments to the plot. Using Illustrator, I was able to clean the plot up and make the small details count. Using other tools can be helpful in your pursuit of beautiful graphics. I was satisfied with my ability to recreate the graphic with using only R on the second graphic. Below is my attempt at recreating the graphic!</p>
+<pre class="r"><code># Proportions plot
+ggplot(position.percent, aes(x = year+2000, 
+                             y = percent.paid,
+                             color = position,
+                             group = position)) +
+  geom_point(alpha = .5, size = 2.5) +
+  geom_smooth(size = .9, se = FALSE) +
+  facet_wrap(~ type) +
+  scale_y_continuous(expand = c(0,0),
+                     limits = c(-0.01, .25),
+                     breaks = c(0, .05, .1, .15, .20),
+                     labels = c(&quot;0&quot;, &quot;5&quot;, &quot;10&quot;, &quot;15&quot;, &quot;20%&quot;)) +
+  scale_color_manual(values = col_pal) +
+  geom_label_repel(data = filter(position.percent, 
+                                 year == &quot;18&quot;), 
+                   aes(label = abb),
+                   label.size = NA) +
+  annotate(&quot;segment&quot;, y = 0, yend = 0, 
+           x = -Inf, xend = Inf,
+           color = &quot;#4d4d4d&quot;, size = .9) + 
+  labs(title = &quot;Teams are spending less on RBs&quot;,
+       subtitle = &quot;Percent of money spent on top 16 players at each position&quot;,
+       caption = &quot;Graphic: @dylanjm_ds | Data: spotrac.com&quot;,
+       x = &quot;Year&quot;, y = &quot;Percent spent on each position&quot;) + 
+  guides(color = FALSE) +
+  wannabe_538</code></pre>
+<p><img src="/posts/2018-05-02-tidy-tuesday-week-02_files/figure-html/unnamed-chunk-10-1.png" width="960" style="display: block; margin: auto;" /></p>
+<p>So that was week two of #TidyTuesday! I hope you were able to learn from my code and realize that using other software can be a helpful tool when creating graphics. ∎</p>
+<style>
+.row {
+  display: flex;
+}
+
+.column {
+  flex: 33.33%;
+  padding: 5px;
+}
+</style>
