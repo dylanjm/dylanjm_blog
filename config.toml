@@ -2,7 +2,7 @@ baseURL = "https://uninformedpriors.org/"
 title = "Uninformed Priors"
 theme = "temple"
 # If not set, it will not appear. Otherwise it will show below your footer links
-googleAnalytics = ""
+googleAnalytics = "UA-118992480-1"
 disqusShortname = ""
 ignoreFiles = ["\\.Rmd$", "\\.Rmarkdown$", "_files$", "_cache$"]
 # enable emoji use, i.e. :smile:
