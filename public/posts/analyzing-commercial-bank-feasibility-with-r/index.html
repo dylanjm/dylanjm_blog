@@ -593,18 +593,14 @@ plot_industry_map &lt;- function(dat, map_dat, ind_code, fill_var, fill_pall = &
             dat = idaho_dat, 
             map_dat = us_map, 
             fill_var = lq_annual_avg_estabs
-)</code></pre>
-<pre><code>## Warning: Ignoring unknown aesthetics: x, y
+)
 
-## Warning: Ignoring unknown aesthetics: x, y
-
-## Warning: Ignoring unknown aesthetics: x, y</code></pre>
-<pre class="r"><code>cowplot::plot_grid(plotlist = plts, ncol = 1) %&gt;% 
+cowplot::plot_grid(plotlist = plts, ncol = 1) %&gt;% 
   add_sub(glue::glue(&quot;Source: Bureau of Labor Statistics QCEW Database&quot;,
                      &quot;\n*Data not available for years with non-filled counties&quot;), 
           y  = .5, hjust = -.8, size = 8, fontface = &quot;italic&quot;) %&gt;%
 ggdraw()</code></pre>
-<p><img src="/posts/2018-05-24-analyzing-commercial-bank-feasibility-with-r_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
+<p><img src="/posts/2018-05-24-analyzing-commercial-bank-feasibility-with-r_files/figure-html/unnamed-chunk-10-1.png" width="960" style="display: block; margin: auto;" /></p>
 </div>
 
       </div>

@@ -193,7 +193,7 @@ plot_industry_map <- function(dat, map_dat, ind_code, fill_var, fill_pall = "Zis
 
 Now I should be able to call my function and create a list of plots!
 
-```{r}
+```{r, warning=FALSE, fig.align='center', fig.height=8, fig.width=10}
 plts <- map(c("5221","52213","52231"), plot_industry_map, 
             dat = idaho_dat, 
             map_dat = us_map, 
