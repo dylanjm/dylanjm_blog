@@ -551,7 +551,60 @@ ggplot() +
           plot.title = element_text(family = &quot;Helvetica Bold Oblique&quot;),
           plot.margin=grid::unit(c(0,0,0,0), &quot;mm&quot;))</code></pre>
 <p><img src="/posts/2018-05-24-analyzing-commercial-bank-feasibility-with-r_files/figure-html/unnamed-chunk-8-1.png" width="960" style="display: block; margin: auto;" /></p>
-<p>Wow, okay so</p>
+<p>Wow, okay so quite a few counties in Idaho rank high on its LQ but there are a few counties that show potential and it appears that over time some markets have shifted away from being over-saturated and vice-versa. While this is interesting to look at, let’s take a look at Credit Unions and Mortgage Brokers in Idaho over time.</p>
+</div>
+<div id="enquo-the-quotient" class="section level1">
+<h1>Enquo the Quotient</h1>
+<p>For this next section, instead of repeating the code three times to create all the plots I need. I am going to take a moment to refactor the code into a function. This function will then be able to be utilized by purrr:map() to create a list of plots that I can then arrange into a grid using <code>library(cowplots)</code>. I want to code this in a way where if I want to change my fill variable, it’s easy to do so. This will require that I use tidyeval.</p>
+<pre class="r"><code># Not the most pretty function
+# This is something I&#39;m still learning on function development.
+# My gut feeling is that I don&#39;t want to assume scope when writing a function
+# So I don&#39;t want to call variables from my Global Environment.
+# Therefore I&#39;m going to give this function, everything I have create thus far.
+plot_industry_map &lt;- function(dat, map_dat, ind_code, fill_var, fill_pall = &quot;Zissou1&quot;){
+  # We want to plot a specific industry at a time
+  ind_dat &lt;- dat %&gt;% 
+    filter(industry_code %in% ind_code)
+  
+  # Here is where we use tidyeval to enquo the fill variable.
+  fill_var_enc &lt;- enquo(fill_var)
+  
+  # Here is the plot in question
+  ggplot() +
+    geom_map(data = map_dat, map = map_dat,
+             aes(long, lat, map_id = id),
+             color = &quot;black&quot;, fill = NA) + 
+    geom_map(data = ind_dat, map = map_dat,
+             aes(fill = !!fill_var_enc, map_id = area_fips)) + 
+    scale_fill_gradientn(colors = wes_palette(fill_pall)) +
+    coord_map() + 
+    facet_grid(.~ year) + 
+    labs(title = glue::glue(&quot;{tools::toTitleCase(ind_dat$industry_title)}&quot;),
+         fill = &quot;LQ&quot;) +
+    theme_minimal() +
+    theme(strip.text = element_text(face = &quot;bold&quot;),
+          axis.title = element_blank(),
+          axis.text = element_blank(),
+          legend.title = element_text(face = &quot;bold&quot;),
+          plot.title = element_text(family = &quot;Helvetica Bold Oblique&quot;))
+}</code></pre>
+<p>Now I should be able to call my function and create a list of plots!</p>
+<pre class="r"><code>plts &lt;- map(c(&quot;5221&quot;,&quot;52213&quot;,&quot;52231&quot;), plot_industry_map, 
+            dat = idaho_dat, 
+            map_dat = us_map, 
+            fill_var = lq_annual_avg_estabs
+)</code></pre>
+<pre><code>## Warning: Ignoring unknown aesthetics: x, y
+
+## Warning: Ignoring unknown aesthetics: x, y
+
+## Warning: Ignoring unknown aesthetics: x, y</code></pre>
+<pre class="r"><code>cowplot::plot_grid(plotlist = plts, ncol = 1) %&gt;% 
+  add_sub(glue::glue(&quot;Source: Bureau of Labor Statistics QCEW Database&quot;,
+                     &quot;\n*Data not available for years with non-filled counties&quot;), 
+          y  = .5, hjust = -.8, size = 8, fontface = &quot;italic&quot;) %&gt;%
+ggdraw()</code></pre>
+<p><img src="/posts/2018-05-24-analyzing-commercial-bank-feasibility-with-r_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
 </div>
 
       </div>
