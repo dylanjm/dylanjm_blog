@@ -13,6 +13,15 @@
     
     
     <item>
+      <title>Analyzing Commercial Bank Feasibility with R</title>
+      <link>/posts/analyzing-commercial-bank-feasibility-with-r/</link>
+      <pubDate>Thu, 24 May 2018 00:00:00 +0000</pubDate>
+      <author>dylan.mcdowell226@gmail.com (Dylan McDowell)</author>
+      <guid>/posts/analyzing-commercial-bank-feasibility-with-r/</guid>
+      <description>Intro Lately I have been doing some consulting work on the topic of commercial bank feasibility in the state of Idaho. My client is interested in looking at potential under-serviced markets they could expand to. While I won’t publish specific data concerning my client, I thought this could be a good opportunity to play with some public data published by the Bureau of Labor Statistics, US Census Bureau, FDIC and others.</description>
+    </item>
+    
+    <item>
       <title>Tidy Tuesday Week 02</title>
       <link>/posts/tidy-tuesday-week-02/</link>
       <pubDate>Wed, 02 May 2018 00:00:00 +0000</pubDate>

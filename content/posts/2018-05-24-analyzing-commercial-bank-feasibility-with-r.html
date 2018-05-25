@@ -1,0 +1,158 @@
+---
+title: Analyzing Commercial Bank Feasibility with R
+author: Dylan McDowell
+date: '2018-05-24'
+slug: analyzing-commercial-bank-feasibility-with-r
+categories:
+  - Posts
+tags:
+  - economics
+  - tidyverse
+  - census
+  - bls
+  - finance
+---
+
+
+
+<div id="intro" class="section level1">
+<h1>Intro</h1>
+<p>Lately I have been doing some consulting work on the topic of commercial bank feasibility in the state of Idaho. My client is interested in looking at potential under-serviced markets they could expand to. While I won’t publish specific data concerning my client, I thought this could be a good opportunity to play with some <strong>public</strong> data published by the <a href="https://www.bls.gov/">Bureau of Labor Statistics</a>, <a href="https://www.census.gov/">US Census Bureau</a>, <a href="https://www.fdic.gov/">FDIC</a> and others.</p>
+<p>In this analysis I will rely heavily on <code>library(purrr)</code>, <code>library(blscrapeR)</code> and <code>library(tidycensus)</code>. I will also, at some point, need to utilize <code>library(rlang)</code>’s <code>enquo()</code> and <code>!!</code>. This is so I can keep my code reproducible and concise. For more information about how to use <code>library(rlang)</code>, you should first consult <a href="https://cran.r-project.org/web/packages/dplyr/vignettes/programming.html">Programming with dplyr</a> for an introduction to the topic. While it may seem daunting at first, it’s obvious to me that this is a powerful tool all data scientists should have in their toolbox.</p>
+<p>Thanks for reading and if you have any questions please feel free to at my twitter handle: <a href="https://twitter.com/dylanjm_ds">@dylanjm_ds</a></p>
+</div>
+<div id="all-i-see-are-quotients" class="section level1">
+<h1>All I See are Quotients</h1>
+<p>Here are the libraries we’ll need for this analytical foray.</p>
+<pre class="r"><code>library(blscrapeR)
+library(tidyverse)
+library(albersusa)
+library(ggalt)
+library(wesanderson)
+library(patchwork)
+library(cowplot)
+library(tidycensus)</code></pre>
+<p>One of the first things that pops into my mind when thinking about potential market opportunities is the <em>Location Quotient</em>. The Location Quotient is defined as follows:</p>
+<p><span class="math display">\[
+LQ = \dfrac{e_{i}/e}{E_{i}/E}
+\]</span></p>
+<p>Where:</p>
+<p><span class="math display">\[
+e_{i} = \text{regional employment in sector} i \\
+e = \text{total regional employment} \\
+E_{i} = \text{national employment in sector} i \\
+E = \text{total national employment}
+\]</span></p>
+<p>This ratio can provide a lot of insight into the saturation of a particular sector for any given area of the United States. Typically, as ratios go, anything higher than 1 starts to exhibit over-saturation for a given market, and anything less than 1 displays market under-utilization. What I want to do is look at the Location Quotient for Commercial Banking, Credit Unions, and Mortgage Loan Brokers (NIACS codes 5221, 52213, 52231 respectively) for each county in Idaho.</p>
+<p>Let’s write a function in combination with <code>library(blsrapeR)</code> to get all the data we need at one time from the Quarterly Census of Employment and Wages from the BLS.</p>
+<pre class="r"><code># The original blscrapeR::qcew_api() is not really suited to take multiple years
+# or niac codes at once. Here is a function that grabs it all!
+get_industry_qcew &lt;- function(years, niac_codes, qtr = &quot;a&quot;){
+  # We want the years to repeat for each industry we&#39;re looking for
+  year_rep &lt;- rep(years, length(niac_codes))
+  # We also want each code to be repeated for each year of interest
+  niac_each &lt;- rep(niac_codes, each = length(years))
+  
+  # Utilize purrr::map2() and purrr::possibly() to either grab our data 
+  # or carry on when it hits an error
+  industry_dat &lt;- map2(year_rep, niac_each,
+                       possibly(
+                         ~ qcew_api(year = .x, qtr = qtr, 
+                                    slice = &quot;industry&quot;, sliceCode = .y),
+                         otherwise = NULL
+                       )
+  ) %&gt;% 
+    compact() %&gt;% # remove any NULL values from our list
+    map_df(bind_rows) # create one large data set 
+  return(industry_dat)
+}</code></pre>
+<p>The above function has the ability to take multiple years and multiple industry codes and return the proper data. If you remember in one of my previous blog posts, <a href="https://uninformedpriors.org/posts/using-purrr-to-wrangle-and-clean-economic-data/">Using purrr to wrangle and clean economic data</a> I had to utilize the <code>possibly()</code> function again, to ensure that my function would not stop when gathering the data. Since I’m only interested in annual averages right now, I’ll go ahead and run the function:</p>
+<pre class="r"><code>qcew_dat &lt;- get_industry_qcew(2013:2016, c(5221, 52213, 52231))</code></pre>
+<p>A quick <code>glimpse()</code> at the data show the number of observations and variables I’ll be working with.</p>
+<pre><code>## Observations: 30,711
+## Variables: 38
+## $ area_fips                        &lt;chr&gt; &quot;01000&quot;, &quot;01000&quot;, &quot;01001&quot;, &quot;0...
+## $ own_code                         &lt;int&gt; 3, 5, 5, 3, 5, 5, 5, 5, 5, 5,...
+## $ industry_code                    &lt;int&gt; 5221, 5221, 5221, 5221, 5221,...
+## $ agglvl_code                      &lt;int&gt; 56, 56, 76, 76, 76, 76, 76, 7...
+## $ size_code                        &lt;int&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,...
+## $ year                             &lt;int&gt; 2013, 2013, 2013, 2013, 2013,...
+## $ qtr                              &lt;chr&gt; &quot;A&quot;, &quot;A&quot;, &quot;A&quot;, &quot;A&quot;, &quot;A&quot;, &quot;A&quot;,...
+## $ disclosure_code                  &lt;chr&gt; &quot;N&quot;, &quot;&quot;, &quot;&quot;, &quot;N&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;,...
+## $ annual_avg_estabs                &lt;int&gt; 1, 2044, 25, 1, 109, 16, 8, 1...
+## $ annual_avg_emplvl                &lt;int&gt; 0, 31836, 200, 0, 782, 126, 5...
+## $ total_annual_wages               &lt;dbl&gt; 0, 1768643334, 8713843, 0, 35...
+## $ taxable_annual_wages             &lt;dbl&gt; 0, 284144494, 1621091, 0, 656...
+## $ annual_contributions             &lt;int&gt; 0, 6261283, 35548, 0, 168962,...
+## $ annual_avg_wkly_wage             &lt;int&gt; 0, 1068, 836, 0, 863, 742, 54...
+## $ avg_annual_pay                   &lt;int&gt; 0, 55555, 43497, 0, 44880, 38...
+## $ lq_disclosure_code               &lt;chr&gt; &quot;N&quot;, &quot;&quot;, &quot;&quot;, &quot;N&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;,...
+## $ lq_annual_avg_estabs             &lt;dbl&gt; 15.86, 1.48, 2.53, 350.90, 1....
+## $ lq_annual_avg_emplvl             &lt;dbl&gt; 0.00, 1.34, 1.52, 0.00, 0.97,...
+## $ lq_total_annual_wages            &lt;dbl&gt; 0.00, 1.38, 1.53, 0.00, 1.05,...
+## $ lq_taxable_annual_wages          &lt;dbl&gt; 0.00, 1.26, 1.46, 0.00, 0.81,...
+## $ lq_annual_contributions          &lt;dbl&gt; 0.00, 1.15, 1.46, 0.00, 0.94,...
+## $ lq_annual_avg_wkly_wage          &lt;dbl&gt; 0.00, 1.03, 1.01, 0.00, 1.08,...
+## $ lq_avg_annual_pay                &lt;dbl&gt; 0.00, 1.03, 1.01, 0.00, 1.08,...
+## $ oty_disclosure_code              &lt;chr&gt; &quot;N&quot;, &quot;&quot;, &quot;&quot;, &quot;N&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;,...
+## $ oty_annual_avg_estabs_chg        &lt;int&gt; 0, 31, 0, 0, -1, 1, 0, 1, 0, ...
+## $ oty_annual_avg_estabs_pct_chg    &lt;dbl&gt; 0.0, 1.5, 0.0, 0.0, -0.9, 6.7...
+## $ oty_annual_avg_emplvl_chg        &lt;int&gt; 0, -114, -5, 0, 0, -6, 0, 6, ...
+## $ oty_annual_avg_emplvl_pct_chg    &lt;dbl&gt; 0.0, -0.4, -2.4, 0.0, 0.0, -4...
+## $ oty_total_annual_wages_chg       &lt;dbl&gt; 0, 40036196, 1052977, 0, -767...
+## $ oty_total_annual_wages_pct_chg   &lt;dbl&gt; 0.0, 2.3, 13.7, 0.0, -2.1, -1...
+## $ oty_taxable_annual_wages_chg     &lt;int&gt; 0, -7696811, 204295, 0, -8503...
+## $ oty_taxable_annual_wages_pct_chg &lt;dbl&gt; 0.0, -2.6, 14.4, 0.0, -11.5, ...
+## $ oty_annual_contributions_chg     &lt;int&gt; 0, -2014732, -1282, 0, -65727...
+## $ oty_annual_contributions_pct_chg &lt;dbl&gt; 0.0, -24.3, -3.5, 0.0, -28.0,...
+## $ oty_annual_avg_wkly_wage_chg     &lt;int&gt; 0, 28, 116, 0, -19, 25, 27, 3...
+## $ oty_annual_avg_wkly_wage_pct_chg &lt;dbl&gt; 0.0, 2.7, 16.1, 0.0, -2.2, 3....
+## $ oty_avg_annual_pay_chg           &lt;int&gt; 0, 1451, 6081, 0, -977, 1297,...
+## $ oty_avg_annual_pay_pct_chg       &lt;dbl&gt; 0.0, 2.7, 16.3, 0.0, -2.1, 3....</code></pre>
+<p>According to the <a href="https://data.bls.gov/cew/doc/layouts/csv_annual_layout.htm">field layouts guide</a> at the BLS website. <code>lq_annual_avg_estabs</code> is the variable I am looking for. I’m looking to make a heat map by county for all the LQ data. I’m going to go ahead and just clean up this data a little bit:</p>
+<pre class="r"><code>qcew_dat_clean &lt;- qcew_dat %&gt;% 
+  # Reorder columns and drop unwanted variables
+  select(area_fips, year, qtr, 
+         industry_code, everything(),
+         -own_code, -agglvl_code, -size_code, -disclosure_code,
+         -lq_disclosure_code, -oty_disclosure_code)</code></pre>
+<p>Now, I want to make my data set interpretable so that when I give it to my client the file is easily digestable. So I’m going to create a County and State column by merging my data with another predefined data.frame that comes with <code>library(blscrapeR)</code>. I am also going to create a column that gives a verbal description of the respective NIACS code. This will make titling my plots easier later.</p>
+<pre class="r"><code>idaho_dat &lt;- qcew_dat_clean %&gt;% 
+  left_join(area_titles, by = &quot;area_fips&quot;) %&gt;% 
+  separate(area_title, c(&quot;county&quot;, &quot;state&quot;), sep = &quot;,&quot;) %&gt;% 
+  mutate_at(vars(state, industry_code), trimws) %&gt;% 
+  left_join(niacs, by = &quot;industry_code&quot;) %&gt;% 
+  mutate_at(vars(industry_title), as.character) %&gt;% 
+  select(area_fips, state, county, 
+         year, qtr, industry_code, industry_title, everything()) %&gt;% 
+  filter(state %in% &quot;Idaho&quot;)</code></pre>
+<p>At this point, I’m dying to just get some plots printed, (let’s be real - I iteratively wrote this code so that it would be as concise as possible, I’ve already seen 1000 plots of this data, but let’s suspend our disbelief as to make it feel natural) What I need to do now is leverage <code>library(alberusa)</code> to set up my mapping data.</p>
+<pre class="r"><code># This will give me all of the lat/long geometry&#39;s for each county in Idaho
+us &lt;- counties_composite()
+us_map &lt;- broom::tidy(us, region = &quot;fips&quot;) %&gt;% 
+  filter(id %in% idaho_dat$area_fips)</code></pre>
+<p>Let’s take a look at how the Commercial Banking (Depository Credit Intermediation) LQ has done over the last few years in Idaho:</p>
+<pre class="r"><code>com_banking &lt;- idaho_dat %&gt;% 
+  filter(industry_code %in% &quot;5221&quot;)
+
+ggplot() +
+    geom_map(data = us_map, map = us_map,
+             aes(long, lat, map_id = id),
+             color = &quot;black&quot;, fill = NA) + 
+    geom_map(data = com_banking, map = us_map,
+             aes(fill = lq_annual_avg_estabs, map_id = area_fips)) + 
+    scale_fill_gradientn(colors = wes_palettes$Zissou1) +
+    coord_map() + 
+    facet_grid(.~ year) + 
+    labs(title = glue::glue(&quot;{tools::toTitleCase(com_banking$industry_title)}&quot;),
+         fill = &quot;LQ&quot;, x = NULL, y = NULL) +
+    theme_minimal() +
+    theme(strip.text = element_text(face = &quot;bold&quot;),
+          axis.title = element_blank(),
+          axis.text = element_blank(),
+          legend.title = element_text(face = &quot;bold&quot;),
+          plot.title = element_text(family = &quot;Helvetica Bold Oblique&quot;),
+          plot.margin=grid::unit(c(0,0,0,0), &quot;mm&quot;))</code></pre>
+<p><img src="/posts/2018-05-24-analyzing-commercial-bank-feasibility-with-r_files/figure-html/unnamed-chunk-8-1.png" width="960" style="display: block; margin: auto;" /></p>
+<p>Wow, okay so</p>
+</div>

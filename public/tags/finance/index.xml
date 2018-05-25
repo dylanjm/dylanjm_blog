@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Finance on Uninformed Priors</title>
+    <link>/tags/finance/</link>
+    <description>Recent content in Finance on Uninformed Priors</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <managingEditor>dylan.mcdowell226@gmail.com (Dylan McDowell)</managingEditor>
+    <webMaster>dylan.mcdowell226@gmail.com (Dylan McDowell)</webMaster>
+    <lastBuildDate>Thu, 24 May 2018 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="/tags/finance/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Analyzing Commercial Bank Feasibility with R</title>
+      <link>/posts/analyzing-commercial-bank-feasibility-with-r/</link>
+      <pubDate>Thu, 24 May 2018 00:00:00 +0000</pubDate>
+      <author>dylan.mcdowell226@gmail.com (Dylan McDowell)</author>
+      <guid>/posts/analyzing-commercial-bank-feasibility-with-r/</guid>
+      <description>Intro Lately I have been doing some consulting work on the topic of commercial bank feasibility in the state of Idaho. My client is interested in looking at potential under-serviced markets they could expand to. While I won’t publish specific data concerning my client, I thought this could be a good opportunity to play with some public data published by the Bureau of Labor Statistics, US Census Bureau, FDIC and others.</description>
+    </item>
+    
+  </channel>
+</rss>

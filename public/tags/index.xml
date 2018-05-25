@@ -22,11 +22,38 @@
     </item>
     
     <item>
+      <title>Bls</title>
+      <link>/tags/bls/</link>
+      <pubDate>Thu, 24 May 2018 00:00:00 +0000</pubDate>
+      <author>dylan.mcdowell226@gmail.com (Dylan McDowell)</author>
+      <guid>/tags/bls/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Census</title>
+      <link>/tags/census/</link>
+      <pubDate>Thu, 24 May 2018 00:00:00 +0000</pubDate>
+      <author>dylan.mcdowell226@gmail.com (Dylan McDowell)</author>
+      <guid>/tags/census/</guid>
+      <description></description>
+    </item>
+    
+    <item>
       <title>Economics</title>
       <link>/tags/economics/</link>
-      <pubDate>Fri, 20 Apr 2018 00:00:00 +0000</pubDate>
+      <pubDate>Thu, 24 May 2018 00:00:00 +0000</pubDate>
       <author>dylan.mcdowell226@gmail.com (Dylan McDowell)</author>
       <guid>/tags/economics/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Finance</title>
+      <link>/tags/finance/</link>
+      <pubDate>Thu, 24 May 2018 00:00:00 +0000</pubDate>
+      <author>dylan.mcdowell226@gmail.com (Dylan McDowell)</author>
+      <guid>/tags/finance/</guid>
       <description></description>
     </item>
     
@@ -69,7 +96,7 @@
     <item>
       <title>Tidyverse</title>
       <link>/tags/tidyverse/</link>
-      <pubDate>Wed, 02 May 2018 00:00:00 +0000</pubDate>
+      <pubDate>Thu, 24 May 2018 00:00:00 +0000</pubDate>
       <author>dylan.mcdowell226@gmail.com (Dylan McDowell)</author>
       <guid>/tags/tidyverse/</guid>
       <description></description>
