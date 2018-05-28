@@ -399,7 +399,7 @@ body {
         |
         
         
-        tags: [ <a href="/tags/economics">economics</a> <a href="/tags/tidyverse">tidyverse</a> <a href="/tags/census">census</a> <a href="/tags/bls">bls</a> <a href="/tags/finance">finance</a> ]
+        tags: [ <a href="/tags/bls">bls</a> <a href="/tags/census">census</a> <a href="/tags/economics">economics</a> <a href="/tags/finance">finance</a> <a href="/tags/tidyverse">tidyverse</a> ]
         
 
         
@@ -426,7 +426,6 @@ library(tidyverse)
 library(albersusa)
 library(ggalt)
 library(wesanderson)
-library(patchwork)
 library(cowplot)
 library(tidycensus)</code></pre>
 <p>One of the first things that pops into my mind when thinking about potential market opportunities is the <em>Location Quotient</em>. The Location Quotient is defined as follows:</p>
@@ -601,6 +600,30 @@ cowplot::plot_grid(plotlist = plts, ncol = 1) %&gt;%
           y  = .5, hjust = -.8, size = 8, fontface = &quot;italic&quot;) %&gt;%
 ggdraw()</code></pre>
 <p><img src="/posts/2018-05-24-analyzing-commercial-bank-feasibility-with-r_files/figure-html/unnamed-chunk-10-1.png" width="960" style="display: block; margin: auto;" /></p>
+<p>Perfect, at this point I can see across several industries what the saturation is for each market. Don’t let the colors fool you as well, if you look at the scale for each map, we can see that credit unions are a highly saturated market in Idaho.</p>
+<p>Let’s take a look at where all these banking institutuions are. By taking a look at the <a href="https://www5.fdic.gov/sod/dynaDownload.asp?barItem=6">FDIC Data Download Tools</a>, we can map out, where all these banks actually are and at the same time, let’s look at the median household income per county. We will gather this data from the US Census:</p>
+<pre class="r"><code>idaho_banks &lt;- read_csv(here::here(&quot;Data/ID_2017_Data.csv&quot;)) %&gt;% 
+  filter(SIMS_LONGITUDE &lt; -1)
+
+idaho_median_income &lt;- get_acs(geography = &quot;county&quot;, 
+        variables = c(mediancome = &quot;B19013_001&quot;), 
+        state = &quot;ID&quot;, geometry = TRUE)</code></pre>
+<pre class="r"><code>ggplot() +
+  geom_sf(data = idaho_median_income, aes(fill = estimate)) +
+  geom_point(data = idaho_banks, 
+             aes(y = SIMS_LATITUDE, x = SIMS_LONGITUDE),
+             color = &quot;grey95&quot;, size = .8) + 
+  coord_sf(datum = NA) + 
+  scale_fill_gradientn(colors = wes_palettes$Rushmore1,
+                       labels = scales::dollar) + 
+  labs(title = &quot;Median Income Across Counties in Idaho&quot;,
+       subtitle = &quot;Each white dot represents a physical branch\nlocation of a bank registered by the FDIC, updated June 2017&quot;,
+       fill =  &quot;Estimate&quot;) + 
+  theme(axis.title = element_blank(),
+        plot.subtitle = element_text(face = &quot;italic&quot;))</code></pre>
+<p><img src="/posts/2018-05-24-analyzing-commercial-bank-feasibility-with-r_files/figure-html/unnamed-chunk-12-1.png" width="960" style="display: block; margin: auto;" /></p>
+<p>As we can see, there are a few counties where the median income is high and not a lot of financial institutions. These could be prime opportunities for a bank to expand.</p>
+<p>I hope you enjoyed this small tutorial on taking secondary data and turning it into valuable graphics that can be easily digested. While this would only be a small part of the consulting process for my client, I have created a reproducible graphic that, with only a few small changes, can give this exact analysis for any state in the country. I have also been able to bypass having to use excel and deal with the potential overhead of the datasets being too large to deal with. If you have any questions or would like to see more please feel free to ask! You can find a gist of my script at <a href="https://gist.github.com/dylanjm/c5e5e5f74dbadc8145116f7ee964e734">github</a>∎</p>
 </div>
 
       </div>
