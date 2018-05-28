@@ -23,7 +23,7 @@ slug: analyzing-commercial-bank-feasibility-with-r
 </div>
 <div id="all-i-see-are-quotients" class="section level1">
 <h1>All I See are Quotients</h1>
-<p>Here are the libraries we’ll need for this analytical foray.</p>
+<p>Here are the libraries we’ll need for this analytic foray.</p>
 <pre class="r"><code>library(blscrapeR)
 library(tidyverse)
 library(albersusa)
@@ -115,7 +115,7 @@ get_industry_qcew &lt;- function(years, niac_codes, qtr = &quot;a&quot;){
          industry_code, everything(),
          -own_code, -agglvl_code, -size_code, -disclosure_code,
          -lq_disclosure_code, -oty_disclosure_code)</code></pre>
-<p>Now, I want to make my data set interpretable so that when I give it to my client the file is easily digestable. So I’m going to create a County and State column by merging my data with another predefined data.frame that comes with <code>library(blscrapeR)</code>. I am also going to create a column that gives a verbal description of the respective NIACS code. This will make titling my plots easier later.</p>
+<p>Now, I want to make my data set interpretable so that when I give it to my client the file is easily digestible. So I’m going to create a County and State column by merging my data with another predefined data.frame that comes with <code>library(blscrapeR)</code>. I am also going to create a column that gives a verbal description of the respective NIACS code. This will make titling my plots easier later.</p>
 <pre class="r"><code>idaho_dat &lt;- qcew_dat_clean %&gt;% 
   left_join(area_titles, by = &quot;area_fips&quot;) %&gt;% 
   separate(area_title, c(&quot;county&quot;, &quot;state&quot;), sep = &quot;,&quot;) %&gt;% 
@@ -204,7 +204,7 @@ cowplot::plot_grid(plotlist = plts, ncol = 1) %&gt;%
 ggdraw()</code></pre>
 <p><img src="/posts/2018-05-24-analyzing-commercial-bank-feasibility-with-r_files/figure-html/unnamed-chunk-10-1.png" width="960" style="display: block; margin: auto;" /></p>
 <p>Perfect, at this point I can see across several industries what the saturation is for each market. Don’t let the colors fool you as well, if you look at the scale for each map, we can see that credit unions are a highly saturated market in Idaho.</p>
-<p>Let’s take a look at where all these banking institutuions are. By taking a look at the <a href="https://www5.fdic.gov/sod/dynaDownload.asp?barItem=6">FDIC Data Download Tools</a>, we can map out, where all these banks actually are and at the same time, let’s look at the median household income per county. We will gather this data from the US Census:</p>
+<p>Let’s take a look at where all these banking institutions are. By taking a look at the <a href="https://www5.fdic.gov/sod/dynaDownload.asp?barItem=6">FDIC Data Download Tools</a>, we can map out, where all these banks actually are and at the same time, let’s look at the median household income per county. We will gather this data from the US Census:</p>
 <pre class="r"><code>idaho_banks &lt;- read_csv(here::here(&quot;Data/ID_2017_Data.csv&quot;)) %&gt;% 
   filter(SIMS_LONGITUDE &lt; -1)
 
@@ -226,5 +226,5 @@ idaho_median_income &lt;- get_acs(geography = &quot;county&quot;,
         plot.subtitle = element_text(face = &quot;italic&quot;))</code></pre>
 <p><img src="/posts/2018-05-24-analyzing-commercial-bank-feasibility-with-r_files/figure-html/unnamed-chunk-12-1.png" width="960" style="display: block; margin: auto;" /></p>
 <p>As we can see, there are a few counties where the median income is high and not a lot of financial institutions. These could be prime opportunities for a bank to expand.</p>
-<p>I hope you enjoyed this small tutorial on taking secondary data and turning it into valuable graphics that can be easily digested. While this would only be a small part of the consulting process for my client, I have created a reproducible graphic that, with only a few small changes, can give this exact analysis for any state in the country. I have also been able to bypass having to use excel and deal with the potential overhead of the datasets being too large to deal with. If you have any questions or would like to see more please feel free to ask! You can find a gist of my script at <a href="https://gist.github.com/dylanjm/c5e5e5f74dbadc8145116f7ee964e734">github</a>∎</p>
+<p>I hope you enjoyed this small tutorial on taking secondary data and turning it into valuable graphics that can be easily digested. While this would only be a small part of the consulting process for my client, I have created a reproducible graphic that, with only a few small changes, can give this exact analysis for any state in the country. I have also been able to bypass having to use excel and deal with the potential overhead of the data sets being too large to deal with. If you have any questions or would like to see more please feel free to ask! You can find a gist of my script at <a href="https://gist.github.com/dylanjm/c5e5e5f74dbadc8145116f7ee964e734">github</a>∎</p>
 </div>
