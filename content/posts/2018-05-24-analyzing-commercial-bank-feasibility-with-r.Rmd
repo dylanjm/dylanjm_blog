@@ -43,9 +43,9 @@ $$
 Where:
 
 $$
-e_{i} = \text{regional employment in sector} i \\
+e_{i} = \text{regional employment in sector} \ i \\
 e = \text{total regional employment} \\
-E_{i} = \text{national employment in sector} i \\
+E_{i} = \text{national employment in sector} \ i \\
 E = \text{total national employment}
 $$
 
